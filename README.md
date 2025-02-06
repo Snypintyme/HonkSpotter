@@ -1,2 +1,3 @@
 # HonkSpotter
-Goose Tracker App
+
+A Interactive Goose Tracker App
