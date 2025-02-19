@@ -1,25 +1,36 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Map from '../components/Map';
-import { gooseLocations as gooseLocationMockData } from '../utils/sampleData';
-import useGooseLocationStore from '../store/useGooseLocationStore';
-import ListView from '../components/ListView';
+import { mockGooseSightings } from '../utils/sampleData';
+import useGooseSightingStore from '../store/useGooseSightingStore';
+import SightingList from '../components/SightingList';
+import { GooseSighting } from '../interfaces/gooseSighting';
+import SightingDetail from '../components/SightingDetail';
 
 const Homepage = () => {
-  const { setGooseLocations } = useGooseLocationStore();
+  const { setGooseSightings: setGooseSightings } = useGooseSightingStore();
+  const [selectedSighting, setSelectedSighting] = useState<GooseSighting | null>(null);
 
   // TODO: fetch data from API
   useEffect(() => {
-    setGooseLocations(gooseLocationMockData);
-  }, [setGooseLocations]);
+    setGooseSightings(mockGooseSightings);
+  }, [setGooseSightings]);
+
+  const onCloseSightingDetail = useCallback(() => {
+    setSelectedSighting(null);
+  }, [setSelectedSighting]);
 
   return (
-    // h-[calc(100vh-64px)] - 64px is the height of the navbar
+    // NOTE: h-[calc(100vh-64px)] - 64px is the height of the navbar
     <div className="flex h-[calc(100vh-64px)]">
       <div className="flex-1 p-5 overflow-y-auto">
-        <ListView />
+        {selectedSighting ? (
+          <SightingDetail sighting={selectedSighting} onClose={onCloseSightingDetail} />
+        ) : (
+          <SightingList setSelectedSighting={setSelectedSighting} />
+        )}
       </div>
       <div className="flex-1 flex">
-        <Map />
+        <Map selectedSighting={selectedSighting} setSelectedSighting={setSelectedSighting} />
       </div>
     </div>
   );
