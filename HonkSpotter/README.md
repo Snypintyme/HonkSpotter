@@ -1,3 +1,5 @@
+# Frontend for the HonkSpotter project
+
 ## Setup
 
 ```bash
