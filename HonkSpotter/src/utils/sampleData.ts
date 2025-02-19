@@ -1,6 +1,6 @@
-import { GooseLocation } from '../interfaces/gooseLocation';
+import { GooseSighting } from '../interfaces/gooseSighting';
 
-export const gooseLocations: GooseLocation[] = [
+export const mockGooseSightings: GooseSighting[] = [
   {
     id: '1',
     title: 'Central Park',
@@ -34,7 +34,7 @@ export const gooseLocations: GooseLocation[] = [
   {
     id: '6',
     title: 'Bryant Park',
-    description: 'Geese wandering around the midto"wn" park.',
+    description: 'Geese wandering around the midtown park.',
     coordinate: { lat: 40.753596, lng: -73.983232 },
   },
   {

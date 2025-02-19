@@ -1,7 +1,17 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { MapContainer, Marker, Popup, TileLayer, useMap } from 'react-leaflet';
-import useGooseLocationStore from '../store/useGooseLocationStore';
+import useGooseSightingStore from '../store/useGooseSightingStore';
 import { LatLngExpression } from 'leaflet';
+import { GooseSighting } from '../interfaces/gooseSighting';
+
+interface MapProps {
+  selectedSighting: GooseSighting | null;
+  setSelectedSighting: (sighting: GooseSighting) => void;
+}
+
+const DEFAULT_CENTER: LatLngExpression = [43.4643, -80.5204]; // Default to Waterloo
+const DEFAULT_ZOOM = 11;
+const DEFAULT_SELECTED_ZOOM = 15;
 
 const ChangeView = ({ center, zoom }: { center: LatLngExpression; zoom: number }) => {
   const map = useMap();
@@ -9,31 +19,60 @@ const ChangeView = ({ center, zoom }: { center: LatLngExpression; zoom: number }
   return null;
 };
 
-const Map = () => {
-  const { gooseLocations } = useGooseLocationStore();
+const Map = ({ selectedSighting, setSelectedSighting }: MapProps) => {
+  const { gooseSightings } = useGooseSightingStore();
+  const [initialMapLoaded, setInitialMapLoaded] = useState<boolean>(false);
 
-  const mapCenter: LatLngExpression = useMemo(() => {
-    console.log(gooseLocations);
-    // TODO: Figure out a better way to default to a center + need to load the data first
-    const lat = gooseLocations.reduce((acc, location) => acc + location.coordinate.lat, 0) / gooseLocations.length;
-    const lng = gooseLocations.reduce((acc, location) => acc + location.coordinate.lng, 0) / gooseLocations.length;
-    return gooseLocations.length > 0 ? [lat, lng] : [43.4643, -80.5204];
-  }, [gooseLocations]);
+  // When goose sightings are loaded, update the default map center and zoom
+  const [defaultSightingCenter, defaultSightingZoom] = useMemo(() => {
+    if (initialMapLoaded === false && gooseSightings.length > 0) {
+      // TODO: This only looks nice with the sample data, figure out a better way to default to a center
+      const lat = gooseSightings.reduce((acc, sighting) => acc + sighting.coordinate.lat, 0) / gooseSightings.length;
+      const lng = gooseSightings.reduce((acc, sighting) => acc + sighting.coordinate.lng, 0) / gooseSightings.length;
+      const newCenter: LatLngExpression = [lat, lng];
+      // NOTE: Hack required to get this to actually work for rerender reasons
+      setTimeout(() => setInitialMapLoaded(true), 100);
+      return [newCenter, DEFAULT_ZOOM];
+    }
+    return [null, null];
+  }, [gooseSightings, initialMapLoaded]);
 
-  const mapZoom: number = useMemo(() => {
-    return 10;
-  }, []);
+  // When a valid sighting is selected, snap to selected sighting
+  const [selectedSightingCenter, selectedSightingZoom] = useMemo(() => {
+    if (selectedSighting) {
+      const newCenter: LatLngExpression = [selectedSighting.coordinate.lat, selectedSighting.coordinate.lng];
+      return [newCenter, DEFAULT_SELECTED_ZOOM];
+    }
+    return [null, null];
+  }, [selectedSighting]);
+
+  const activeCenter = defaultSightingCenter ?? selectedSightingCenter;
+  const activeZoom = defaultSightingZoom ?? selectedSightingZoom;
 
   return (
-    <MapContainer center={[43.4643, -80.5204]} zoom={10}>
-      <ChangeView center={mapCenter} zoom={mapZoom} />
+    <MapContainer center={DEFAULT_CENTER} zoom={DEFAULT_ZOOM}>
+      {activeCenter && <ChangeView center={activeCenter} zoom={activeZoom ?? DEFAULT_ZOOM} />}
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
-      {gooseLocations.map((location) => (
-        <Marker key={location.id} position={[location.coordinate.lat, location.coordinate.lng]}>
-          <Popup>{location.title}</Popup>
+      {gooseSightings.map((sighting) => (
+        <Marker
+          key={sighting.id}
+          position={[sighting.coordinate.lat, sighting.coordinate.lng]}
+          eventHandlers={{
+            click: () => {
+              setSelectedSighting(sighting);
+            },
+            mouseover: (e) => {
+              e.target.openPopup();
+            },
+            mouseout: (e) => {
+              e.target.closePopup();
+            },
+          }}
+        >
+          <Popup closeButton={false}>{sighting.title}</Popup>
         </Marker>
       ))}
     </MapContainer>

@@ -1,6 +1,7 @@
 import { Coordinate } from './coordinate';
 
-export interface GooseLocation {
+// TODO: Add user who reported it
+export interface GooseSighting {
   id: string;
   title: string;
   description: string;
