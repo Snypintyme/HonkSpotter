@@ -11,6 +11,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { AuthResponse } from '@/interfaces/auth';
 import { ApiEndpoints } from '@/enums/apiEndpoints';
 import { useSnackbar } from 'notistack';
+import { useNavigate } from '@tanstack/react-router';
 
 interface AuthFormProps extends React.ComponentProps<'div'> {
   authType: AuthType;
@@ -24,6 +25,7 @@ interface FormValues {
 export function AuthForm({ authType, className, ...props }: AuthFormProps) {
   const { setAccessToken } = useAuthStore();
   const { enqueueSnackbar } = useSnackbar();
+  const navigate = useNavigate();
 
   const {
     register,
@@ -49,6 +51,7 @@ export function AuthForm({ authType, className, ...props }: AuthFormProps) {
       if (data?.access_token) {
         setAccessToken(data.access_token);
       }
+      navigate({ to: '/' });
       console.log(`${authType === AuthType.Login ? 'Login' : 'Signup'} successful`, data);
     },
     onError: (error) => {

@@ -6,6 +6,8 @@ from flask_jwt_extended import (
     create_refresh_token,
     jwt_required,
     get_jwt_identity,
+    set_refresh_cookies,
+    unset_jwt_cookies,
 )
 from datetime import timedelta
 import os
@@ -33,13 +35,14 @@ app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=refresh_days)
 app.config["JWT_COOKIE_SECURE"] = os.getenv("JWT_COOKIE_SECURE", "True") == "True"
 app.config["JWT_COOKIE_SAMESITE"] = os.getenv("JWT_COOKIE_SAMESITE", "Strict")
 app.config["JWT_TOKEN_LOCATION"] = ["headers", "cookies"]
+app.config["JWT_COOKIE_CSRF_PROTECT"] = True
 
 jwt = JWTManager(app)
 
 api_bp = Blueprint("api", __name__)
 
 
-@api_bp.route("/test", methods=["GET"])
+@api_bp.route("/test", methods=["GET", "POST"])
 @jwt_required()
 def test():
     current_user = get_jwt_identity()
@@ -68,13 +71,7 @@ def login():
     refresh_token = create_refresh_token(identity=email)
 
     response = make_response(jsonify(access_token=access_token))
-    response.set_cookie(
-        "refresh_token",
-        refresh_token,
-        httponly=True,
-        secure=app.config["JWT_COOKIE_SECURE"],
-        samesite=app.config["JWT_COOKIE_SAMESITE"],
-    )
+    set_refresh_cookies(response, refresh_token)
     return response, 200
 
 
@@ -97,13 +94,7 @@ def signup():
     refresh_token = create_refresh_token(identity=email)
 
     response = make_response(jsonify(access_token=access_token))
-    response.set_cookie(
-        "refresh_token",
-        refresh_token,
-        httponly=True,
-        secure=app.config["JWT_COOKIE_SECURE"],
-        samesite=app.config["JWT_COOKIE_SAMESITE"],
-    )
+    set_refresh_cookies(response, refresh_token)
     return response, 200
 
 
@@ -120,13 +111,21 @@ def refresh():
     new_access_token = create_access_token(identity=current_user)
     new_refresh_token = create_refresh_token(identity=current_user)
     response = make_response(jsonify(access_token=new_access_token))
-    response.set_cookie(
-        "refresh_token",
-        new_refresh_token,
-        httponly=True,
-        secure=app.config["JWT_COOKIE_SECURE"],
-        samesite=app.config["JWT_COOKIE_SAMESITE"],
-    )
+    set_refresh_cookies(response, new_refresh_token)
+    return response, 200
+
+
+@api_bp.route("/logout", methods=["POST"])
+def logout():
+    """
+    POST /api/logout
+
+    Revokes the refresh token by clearing the refresh token cookie.
+    This signals to the client that the access token should be removed
+    and that the user is now logged out.
+    """
+    response = make_response(jsonify({"msg": "Logged out"}))
+    unset_jwt_cookies(response)
     return response, 200
 
 
