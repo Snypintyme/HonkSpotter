@@ -1,4 +1,4 @@
-# Frontend for the HonkSpotter project
+# HonkSpotter React Frontend
 
 ## Setup
 

@@ -2,7 +2,7 @@ import axios, { AxiosRequestHeaders, AxiosResponse } from 'axios';
 import { useAuthStore } from '@/store/useAuthStore';
 
 const apiClient = axios.create({
-  baseURL: 'http://localhost:5000/api', // TODO: move to env
+  baseURL: 'http://localhost:8080/api', // TODO: move to env
   withCredentials: true,
 });
 
@@ -36,7 +36,7 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
-        const refreshResponse = await axios.post('http://localhost:5000/api/refresh', {}, { withCredentials: true });
+        const refreshResponse = await axios.post('http://localhost:8080/api/refresh', {}, { withCredentials: true });
         const newAccessToken = refreshResponse.data.access_token;
         useAuthStore.getState().setAccessToken(newAccessToken);
 
@@ -52,3 +52,4 @@ apiClient.interceptors.response.use(
 );
 
 export default apiClient;
+
