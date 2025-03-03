@@ -8,7 +8,7 @@ interface GooseSightingsState {
   removeGooseSighting: (id: string) => void;
 }
 
-const useGooseSightingStore = create<GooseSightingsState>()((set) => ({
+export const useGooseSightingStore = create<GooseSightingsState>()((set) => ({
   gooseSightings: [],
   setGooseSightings: (sightings: GooseSighting[]) => set({ gooseSightings: sightings }),
   addGooseSighting: (sighting: GooseSighting) =>
@@ -18,5 +18,3 @@ const useGooseSightingStore = create<GooseSightingsState>()((set) => ({
       gooseSightings: state.gooseSightings.filter((sighting) => sighting.id !== id),
     })),
 }));
-
-export default useGooseSightingStore;

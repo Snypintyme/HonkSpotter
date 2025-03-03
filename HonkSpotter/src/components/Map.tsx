@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react';
 import { MapContainer, Marker, Popup, TileLayer, useMap } from 'react-leaflet';
-import useGooseSightingStore from '../store/useGooseSightingStore';
+import { useGooseSightingStore } from '@/store/useGooseSightingStore';
 import { LatLngExpression } from 'leaflet';
-import { GooseSighting } from '../interfaces/gooseSighting';
+import { GooseSighting } from '@/interfaces/gooseSighting';
 
 interface MapProps {
   selectedSighting: GooseSighting | null;
