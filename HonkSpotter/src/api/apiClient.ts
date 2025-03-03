@@ -1,5 +1,14 @@
 import axios, { AxiosRequestHeaders, AxiosResponse } from 'axios';
 import { useAuthStore } from '@/store/useAuthStore';
+import { enqueueSnackbar } from 'notistack';
+
+const getCookieValue = (name: string): string | null => {
+  const matches = document.cookie.match(
+    // eslint-disable-next-line no-useless-escape
+    new RegExp('(?:^|; )' + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + '=([^;]*)')
+  );
+  return matches ? decodeURIComponent(matches[1]) : null;
+};
 
 const apiClient = axios.create({
   baseURL: 'http://localhost:8080/api', // TODO: move to env
@@ -36,7 +45,13 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
-        const refreshResponse = await axios.post('http://localhost:8080/api/refresh', {}, { withCredentials: true });
+        const accessToken = useAuthStore.getState().accessToken;
+        const csrfToken = getCookieValue('csrf_refresh_token');
+        const refreshResponse = await axios.post(
+          'http://localhost:8080/api/refresh',
+          { access_token: accessToken },
+          { withCredentials: true, headers: { 'X-CSRF-TOKEN': csrfToken } }
+        );
         const newAccessToken = refreshResponse.data.access_token;
         useAuthStore.getState().setAccessToken(newAccessToken);
 
@@ -44,6 +59,7 @@ apiClient.interceptors.response.use(
         return apiClient(originalRequest);
       } catch (refreshError) {
         useAuthStore.getState().clearAccessToken();
+        enqueueSnackbar('Your session has expired. Please log in again.', { variant: 'error' });
         return Promise.reject(refreshError);
       }
     }
