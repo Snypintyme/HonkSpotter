@@ -1,5 +1,5 @@
-import { GooseSighting } from '../interfaces/gooseSighting';
-import useGooseSightingStore from '../store/useGooseSightingStore';
+import { GooseSighting } from '@/interfaces/gooseSighting';
+import { useGooseSightingStore } from '@/store/useGooseSightingStore';
 
 interface SightingListProps {
   setSelectedSighting: (sighting: GooseSighting) => void;

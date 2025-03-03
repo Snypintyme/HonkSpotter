@@ -1,4 +1,5 @@
-import { GooseSighting } from '../interfaces/gooseSighting';
+import { GooseSighting } from '@/interfaces/gooseSighting';
+import { Button } from './ui/button';
 
 interface SightingDetailProps {
   sighting: GooseSighting;
@@ -8,9 +9,9 @@ interface SightingDetailProps {
 const SightingDetail = ({ sighting, onClose }: SightingDetailProps) => {
   return (
     <div className="p-4">
-      <button onClick={onClose} className="mb-4 text-blue-500 hover:underline cursor-pointer">
+      <Button variant="link" onClick={onClose} className="text-blue-500 px-0">
         &larr; Back
-      </button>
+      </Button>
       <h3 className="text-xl font-bold mb-2">{sighting.title}</h3>
       <p className="mb-2">{sighting.description}</p>
       <p className="text-sm text-gray-600">
@@ -21,4 +22,3 @@ const SightingDetail = ({ sighting, onClose }: SightingDetailProps) => {
 };
 
 export default SightingDetail;
-
