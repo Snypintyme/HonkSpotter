@@ -12,9 +12,8 @@ from flask_jwt_extended import (
 from datetime import timedelta
 import os
 from dotenv import load_dotenv
-
-
-
+import json
+from schemas import GooseSighting
 
 # Load environment variables from .env file
 load_dotenv()
@@ -220,6 +219,31 @@ def logout():
     except Exception as e:
         security_logger.error(f"Logout error - IP: {request.remote_addr}")
         debug_logger.error("Logout error", exc_info=True)
+        return jsonify({"error": "Internal server error"}), 500
+
+@api_bp.route("/submit-sighting", methods=["POST"])
+@jwt_required()
+def submit_sighting():
+    """
+    POST /api/submit-sighting
+
+    Adds a new goose sighting to the database
+    """
+    try:
+        current_user = get_jwt_identity()
+        security_logger.info(f"Submit goose sighting - IP: {request.remote_addr}")
+
+        request_data = request.get_json(force=True) # object
+        data = GooseSighting(**request_data)
+
+        debug_logger.debug(f"Submit goose sighting by {current_user}, name='{data.name}', notes='{data.notes}', coords='{data.coords}', img link='{data.image}'")
+
+        response = make_response(jsonify({"msg": "Successfully submitted goose sighting"}))
+        return response, 200
+
+    except Exception as e:
+        security_logger.error(f"Submit goose sighting error - IP: {request.remote_addr} - Error: {e}")
+        debug_logger.error(f"Submit goose sighting error: {e}", exc_info=True)
         return jsonify({"error": "Internal server error"}), 500
 
 @app.errorhandler(Exception)

@@ -66,6 +66,43 @@ def test_logout():
     assert response.status_code == 200
     assert response.json()["msg"] == "Logged out"
 
+def test_submit_sighting():
+    """Test goose sighting submission"""
+    login_data = {"email": "test@test.com", "password": "test"}
+    login_response = requests.post(f"{BASE_URL}/login", json=login_data)
+    access_token = login_response.json().get("access_token")
+
+    assert access_token is not None
+
+    headers = {"Authorization": f"Bearer {access_token}", "Content-Type": "application/json"}
+    data = {
+        "name": "goose location 1",
+        "notes": "i am a note",
+        "coords": "2,2",
+        "image": "somes3url.com"
+    }
+    response = requests.post(f"{BASE_URL}/submit-sighting", headers=headers, json=data)
+    assert response.status_code == 200
+    assert response.json()["msg"] == "Successfully submitted goose sighting"
+
+def test_submit_invalid_schema_sighting():
+    """Test goose sighting submission with an invalid json schema"""
+    login_data = {"email": "test@test.com", "password": "test"}
+    login_response = requests.post(f"{BASE_URL}/login", json=login_data)
+    access_token = login_response.json().get("access_token")
+
+    assert access_token is not None
+
+    headers = {"Authorization": f"Bearer {access_token}", "Content-Type": "application/json"}
+    data = {
+        "name": "goose location 1",
+        "notes": "i am a note",
+        "coords": "2,2",
+        "image": 3
+    }
+    response = requests.post(f"{BASE_URL}/submit-sighting", headers=headers, json=data)
+    assert response.status_code == 500
+
 
 def test_protected_route_requires_auth():
     """Test accessing a protected route without authentication"""
