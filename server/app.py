@@ -13,8 +13,51 @@ from datetime import timedelta
 import os
 from dotenv import load_dotenv
 
+
+
+
 # Load environment variables from .env file
 load_dotenv()
+
+# Logging stuff
+import logging
+from logging.handlers import RotatingFileHandler
+
+# Ensure logs directory exists
+if not os.path.exists("logs"):
+    os.makedirs("logs")
+
+# Read environment mode (default to dev)
+FLASK_ENV = os.getenv("FLASK_ENV", "development")
+
+# Security logger (Always enabled)
+security_log_file = "logs/security.log"
+security_handler = RotatingFileHandler(security_log_file, maxBytes=5 * 1024 * 1024, backupCount=3)
+security_formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+security_handler.setFormatter(security_formatter)
+
+security_logger = logging.getLogger("security")
+security_logger.setLevel(logging.INFO)
+security_logger.addHandler(security_handler)
+
+# Debug logger (Only enabled in development)
+debug_logger = logging.getLogger("debug")
+
+if FLASK_ENV == "development": # TODO: Make sure when prod is set up that the debug stuff isnt logged
+    debug_log_file = "logs/debug.log"
+    debug_handler = RotatingFileHandler(debug_log_file, maxBytes=5 * 1024 * 1024, backupCount=3)
+    debug_formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s [%(pathname)s:%(lineno)d]")
+    debug_handler.setFormatter(debug_formatter)
+
+    debug_logger.setLevel(logging.DEBUG)
+    debug_logger.addHandler(debug_handler)
+else:
+    debug_logger.setLevel(logging.CRITICAL)  # Disable debug logging in prod
+
+security_logger.info("Flask server initialized")
+if FLASK_ENV == "development":
+    debug_logger.debug("Debugging enabled - Development Mode")
+#------------
 
 app = Flask(__name__)
 
@@ -57,22 +100,41 @@ def login():
     Expects JSON { "username": ..., "password": ... }.
     Returns a JWT access token in the JSON response and sets a refresh token as an httpOnly cookie.
     """
-    data = request.get_json()
-    email = data.get("email")
-    password = data.get("password")
-    if not email or not password:
-        return jsonify({"msg": "Missing email or password"}), 400
+    try:
+        if not request.is_json:
+            security_logger.warning(f"Login attempt failed: No JSON payload - IP: {request.remote_addr}")
+            return jsonify({"error": "Invalid request, expected JSON"}), 400
 
-    # TODO: Validate credentials properly
-    if email != "test@test.com" or password != "test":
-        return jsonify({"msg": "Invalid email or password"}), 401
+        data = request.get_json(silent=True)
+        if data is None:
+            security_logger.warning(f"Login attempt failed: Invalid JSON format - IP: {request.remote_addr}")
+            return jsonify({"error": "Invalid JSON format"}), 400
 
-    access_token = create_access_token(identity=email)
-    refresh_token = create_refresh_token(identity=email)
+        email = data.get("email")
+        password = data.get("password")
 
-    response = make_response(jsonify(access_token=access_token))
-    set_refresh_cookies(response, refresh_token)
-    return response, 200
+        if not email or not password:
+            security_logger.warning(f"Login attempt failed: Missing email or password - IP: {request.remote_addr}")
+            return jsonify({"msg": "Missing email or password"}), 400
+
+        # TODO: Validate credentials properly
+        if email != "test@test.com" or password != "test":
+            security_logger.warning(f"Failed login attempt - IP: {request.remote_addr}")
+            return jsonify({"msg": "Invalid email or password"}), 401
+
+        security_logger.info(f"Successful login - IP: {request.remote_addr}")
+        debug_logger.debug(f"User {email} logged in successfully")
+
+        access_token = create_access_token(identity=email)
+        refresh_token = create_refresh_token(identity=email)
+
+        response = make_response(jsonify(access_token=access_token))
+        set_refresh_cookies(response, refresh_token)
+        return response, 200
+
+    except Exception as e:
+        security_logger.error(f"Login error: {str(e)}", exc_info=True)
+        return jsonify({"error": "Internal server error"}), 500
 
 
 @api_bp.route("/signup", methods=["POST"])
@@ -83,19 +145,30 @@ def signup():
     Expects JSON { "username": ..., "password": ... }.
     Creates a user (placeholder) and returns a JWT access token, setting the refresh token as an httpOnly cookie.
     """
-    data = request.get_json()
-    email = data.get("email")
-    password = data.get("password")
-    if not email or not password:
-        return jsonify({"msg": "Missing email or password"}), 400
+    try:
+        data = request.get_json()
+        email = data.get("email")
+        password = data.get("password")
 
-    # TODO: Create user and hash password accordingly
-    access_token = create_access_token(identity=email)
-    refresh_token = create_refresh_token(identity=email)
+        if not email or not password:
+            security_logger.warning(f"Signup attempt failed: Missing email or password - IP: {request.remote_addr}")
+            return jsonify({"msg": "Missing email or password"}), 400
 
-    response = make_response(jsonify(access_token=access_token))
-    set_refresh_cookies(response, refresh_token)
-    return response, 200
+        # TODO: Create user and hash password accordingly
+        security_logger.info(f"New user signed up - IP: {request.remote_addr}")
+        debug_logger.debug(f"User {email} created successfully")
+
+        access_token = create_access_token(identity=email)
+        refresh_token = create_refresh_token(identity=email)
+
+        response = make_response(jsonify(access_token=access_token))
+        set_refresh_cookies(response, refresh_token)
+        return response, 200
+
+    except Exception as e:
+        security_logger.error(f"Signup error - IP: {request.remote_addr}")
+        debug_logger.error("Signup error", exc_info=True)
+        return jsonify({"error": "Internal server error"}), 500
 
 
 @api_bp.route("/refresh", methods=["POST"])
@@ -107,15 +180,26 @@ def refresh():
     Requires a valid refresh token (provided via cookie).
     Returns a new access token and rotates the refresh token.
     """
-    current_user = get_jwt_identity()
-    new_access_token = create_access_token(identity=current_user)
-    new_refresh_token = create_refresh_token(identity=current_user)
-    response = make_response(jsonify(access_token=new_access_token))
-    set_refresh_cookies(response, new_refresh_token)
-    return response, 200
+    try:
+        current_user = get_jwt_identity()
+        security_logger.info(f"Token refreshed - IP: {request.remote_addr}")
+        debug_logger.debug(f"Token refreshed for {current_user}")
+
+        new_access_token = create_access_token(identity=current_user)
+        new_refresh_token = create_refresh_token(identity=current_user)
+
+        response = make_response(jsonify(access_token=new_access_token))
+        set_refresh_cookies(response, new_refresh_token)
+        return response, 200
+
+    except Exception as e:
+        security_logger.error(f"Token refresh error - IP: {request.remote_addr}")
+        debug_logger.error("Token refresh error", exc_info=True)
+        return jsonify({"error": "Internal server error"}), 500
 
 
 @api_bp.route("/logout", methods=["POST"])
+@jwt_required()
 def logout():
     """
     POST /api/logout
@@ -124,9 +208,26 @@ def logout():
     This signals to the client that the access token should be removed
     and that the user is now logged out.
     """
-    response = make_response(jsonify({"msg": "Logged out"}))
-    unset_jwt_cookies(response)
-    return response, 200
+    try:
+        current_user = get_jwt_identity()
+        security_logger.info(f"User logged out - IP: {request.remote_addr}")
+        debug_logger.debug(f"User {current_user} logged out")
+
+        response = make_response(jsonify({"msg": "Logged out"}))
+        unset_jwt_cookies(response)
+        return response, 200
+
+    except Exception as e:
+        security_logger.error(f"Logout error - IP: {request.remote_addr}")
+        debug_logger.error("Logout error", exc_info=True)
+        return jsonify({"error": "Internal server error"}), 500
+
+@app.errorhandler(Exception)
+def handle_exception(e):
+    """Log sanitized error messages for security logs."""
+    security_logger.error(f"Unhandled exception - IP: {request.remote_addr}")
+    debug_logger.error("Unhandled exception", exc_info=True)
+    return jsonify({"error": "Internal server error"}), 500
 
 
 app.register_blueprint(api_bp, url_prefix="/api")
