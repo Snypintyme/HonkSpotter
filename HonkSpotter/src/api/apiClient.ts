@@ -10,8 +10,9 @@ const getCookieValue = (name: string): string | null => {
   return matches ? decodeURIComponent(matches[1]) : null;
 };
 
+const apiURL = 'http://localhost:8000';
 const apiClient = axios.create({
-  baseURL: 'http://localhost:8080/api', // TODO: move to env
+  baseURL: `${apiURL}/api`, // TODO: move to env
   withCredentials: true,
 });
 
@@ -48,7 +49,7 @@ apiClient.interceptors.response.use(
         const accessToken = useAuthStore.getState().accessToken;
         const csrfToken = getCookieValue('csrf_refresh_token');
         const refreshResponse = await axios.post(
-          'http://localhost:8080/api/refresh',
+          `${apiURL}/api/refresh`,
           { access_token: accessToken },
           { withCredentials: true, headers: { 'X-CSRF-TOKEN': csrfToken } }
         );
@@ -68,4 +69,3 @@ apiClient.interceptors.response.use(
 );
 
 export default apiClient;
-
