@@ -63,3 +63,25 @@ def submit_sighting():
         security_logger.error(f"Error: submit goose sighting - IP: {request.remote_addr}\n{e}")
         debug_logger.error(f"Error: submit goose sighting\n{e}", exc_info=True)
         return jsonify({"error": str(e)}), 500
+
+@main_bp.route("/sightings", methods=["GET"])
+@jwt_required()
+def sightings():
+    """
+    GET /api/sightings
+    Gets all active goose sightings in the database
+    """
+    try:
+        current_user = get_jwt_identity()
+        security_logger.info(f"Get goose sightings - IP: {request.remote_addr}")
+
+        goose_sightings = Sighting.query.all()
+
+        debug_logger.debug(f"Get goose sightings by {current_user}, number of sightings: {len(goose_sightings)}")
+        response = make_response(jsonify({"sightings": goose_sightings}))
+        return response, 200
+
+    except Exception as e:
+        security_logger.error(f"Error: get goose sightings - IP: {request.remote_addr}\n{e}")
+        debug_logger.error(f"Error: get goose sightings\n{e}", exc_info=True)
+        return jsonify({"error": str(e)}), 500

@@ -123,6 +123,22 @@ def test_submit_invalid_image_link_sighting():
     response = requests.post(f"{BASE_URL}/submit-sighting", headers=headers, json=data)
     assert response.status_code == 400
 
+def test_get_sightings():
+    """Test fetching all goose sightings"""
+    login_data = {"email": "test@test.com", "password": "test"}
+    login_response = requests.post(f"{BASE_URL}/login", json=login_data)
+    access_token = login_response.json().get("access_token")
+
+    assert access_token is not None
+
+    headers = {"Authorization": f"Bearer {access_token}"}
+
+    response = requests.get(f"{BASE_URL}/sightings", headers=headers)
+    data = response.json()
+    sighting = data.get("sightings")
+
+    assert response.status_code == 200
+    assert len(sighting) > 0
 
 def test_protected_route_requires_auth():
     """Test accessing a protected route without authentication"""
