@@ -96,3 +96,19 @@ python -m flask run --port 8000
 ```
 
 This will start the Flask development server and you should be able to access the application at `http://localhost:8000`.
+
+## Testing
+
+To run the tests, use the following command:
+
+```bash
+pytest
+```
+
+This will run all tests in the `tests` directory and generate a report in the terminal.
+
+You can also run specific tests by providing the test file name:
+
+```bash
+pytest tests/test_auth.py
+```
