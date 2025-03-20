@@ -82,7 +82,6 @@ def sightings():
         return response, 200
 
     except Exception as e:
-        db.session.rollback()   # does nothing if no transaction occured
         security_logger.error(f"Error: get goose sightings - IP: {request.remote_addr}\n{e}")
         debug_logger.error(f"Error: get goose sightings\n{e}", exc_info=True)
         return jsonify({"error": str(e)}), 500
