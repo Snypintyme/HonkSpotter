@@ -1,5 +1,6 @@
 import uuid
 import re
+import datetime
 from app import db
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import validates, relationship
@@ -15,6 +16,7 @@ class Sighting(db.Model):
     image = db.Column(db.String(256), nullable=True)
     user_id = db.Column(UUID(as_uuid=True), db.ForeignKey("users.id"))
     user = relationship("User", back_populates="posts")
+    created_date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
 
     @validates('name')
     def validate_name(self, key, name):
