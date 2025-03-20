@@ -1,6 +1,7 @@
 import requests
 
-BASE_URL = "http://127.0.0.1:8080/api"
+BASE_URL = "http://127.0.0.1:8000/api"
+
 
 # Used pytest to run these
 def test_login_success():
@@ -43,14 +44,15 @@ def test_refresh_token():
 
     headers = {
         "Authorization": f"Bearer {refresh_token}",
-        "X-CSRF-TOKEN": csrf_token  # Include CSRF token
+        "X-CSRF-TOKEN": csrf_token,  # Include CSRF token
     }
 
-    response = requests.post(f"{BASE_URL}/refresh", headers=headers, cookies=login_response.cookies)
+    response = requests.post(
+        f"{BASE_URL}/refresh", headers=headers, cookies=login_response.cookies
+    )
 
     assert response.status_code == 200, f"Refresh token request failed: {response.text}"
     assert "access_token" in response.json()
-
 
 
 def test_logout():
@@ -109,5 +111,6 @@ def test_protected_route_requires_auth():
     response = requests.get(f"{BASE_URL}/test")
 
     assert response.status_code == 401, f"Expected 401, got {response.status_code}"
-    assert "Missing JWT" in response.json()["msg"], f"Unexpected error message: {response.json()}"
-
+    assert (
+        "Missing JWT" in response.json()["msg"]
+    ), f"Unexpected error message: {response.json()}"
