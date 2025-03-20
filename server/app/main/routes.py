@@ -3,6 +3,7 @@ from flask import Blueprint, request, jsonify, make_response
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from app.models.sightings import Sighting
+from app.models.user import User
 from app import db
 
 main_bp = Blueprint("main", __name__)
@@ -28,8 +29,13 @@ def submit_sighting():
         current_user = get_jwt_identity()
         security_logger.info(f"Submit goose sighting - IP: {request.remote_addr}")
 
-        data = request.get_json(force=True) # object
+        # Get user
+        user = User.query.filter_by(email=current_user).first()
+        if not user:
+            security_logger.warning(f"User does not exist - IP: {request.remote_addr}")
+            return jsonify({"error": "User does not exist"}), 500
 
+        data = request.get_json(force=True) # object
         if not data:
             raise Exception("No data provided")
 
@@ -38,7 +44,7 @@ def submit_sighting():
         coords = data.get('coords')
         image = data.get('image')
 
-        goose_sighting = Sighting(name=name, notes=notes, coords=coords, image=image)
+        goose_sighting = Sighting(name=name, notes=notes, coords=coords, image=image, user_id=current_user, user=user)
         db.session.add(goose_sighting)
         db.session.commit()
 
