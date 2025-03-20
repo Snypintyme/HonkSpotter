@@ -5,9 +5,21 @@ from app import db
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import validates, relationship
 from werkzeug.security import generate_password_hash, check_password_hash
+from sqlalchemy.orm import validates
+from dataclasses import dataclass
+from app.models.user import User
+from typing import List
 
+@dataclass
 class Sighting(db.Model):
     __tablename__ = "sightings"
+    id: str
+    name: str
+    notes: str
+    coords: str
+    image: str
+    user_id: str
+    created_date: datetime.datetime
 
     id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name = db.Column(db.String(80), nullable=False)
