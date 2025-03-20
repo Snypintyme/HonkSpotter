@@ -61,12 +61,6 @@ docker run --name honkspotter_db \
   -p 5432:5432 -d postgres
 ```
 
-Then run migrations if necessary:
-
-```bash
-python -m flask db migrate
-```
-
 To create a new migration, update the models in `app/models` and run:
 
 ```bash
@@ -74,6 +68,7 @@ python -m flask db migrate -m "<Migration Name>"
 ```
 
 After creating the migration, upgrade the database:
+
 ```bash
 python -m flask db upgrade
 ```
@@ -85,6 +80,7 @@ docker run --name pgadmin4 -p 8080:80 -e "PGADMIN_DEFAULT_EMAIL=user@example.com
 ```
 
 Alternatively, if you can't get pgAdmin to work, you can inspect the database through command line:
+
 ```bash
 docker exec -it "<postgres container name>" bash
 psql -U postgres
