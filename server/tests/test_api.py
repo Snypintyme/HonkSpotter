@@ -19,13 +19,13 @@ def test_login_fail():
     assert response.status_code == 401
     assert response.json()["msg"] == "Invalid email or password"
 
-
-def test_signup():
-    """Test user signup"""
-    data = {"email": "newuser@test.com", "password": "password123"}
-    response = requests.post(f"{BASE_URL}/signup", json=data)
-    assert response.status_code == 200
-    assert "access_token" in response.json()
+# TODO figure out how to test without polluting user database
+# def test_signup():
+#     """Test user signup"""
+#     data = {"email": "newuser@test.com", "password": "password123"}
+#     response = requests.post(f"{BASE_URL}/signup", json=data)
+#     assert response.status_code == 200
+#     assert "access_token" in response.json()
 
 
 def test_refresh_token():
@@ -67,6 +67,61 @@ def test_logout():
     response = requests.post(f"{BASE_URL}/logout", headers=headers)
     assert response.status_code == 200
     assert response.json()["msg"] == "Logged out"
+
+def test_submit_sighting():
+    """Test goose sighting submission"""
+    login_data = {"email": "test@test.com", "password": "test"}
+    login_response = requests.post(f"{BASE_URL}/login", json=login_data)
+    access_token = login_response.json().get("access_token")
+
+    assert access_token is not None
+
+    headers = {"Authorization": f"Bearer {access_token}", "Content-Type": "application/json"}
+    data = {
+        "name": "goose location 1",
+        "notes": "i am a note",
+        "coords": "34.0522,-118.2437",
+        "image": "https://my-bucket-name.s3.amazonaws.com/folder1/image.jpg"
+    }
+    response = requests.post(f"{BASE_URL}/submit-sighting", headers=headers, json=data)
+    assert response.status_code == 201
+    assert response.json()["msg"] == "Successfully submitted goose sighting"
+
+def test_submit_invalid_coords_sighting():
+    """Test goose sighting submission with an invalid json schema"""
+    login_data = {"email": "test@test.com", "password": "test"}
+    login_response = requests.post(f"{BASE_URL}/login", json=login_data)
+    access_token = login_response.json().get("access_token")
+
+    assert access_token is not None
+
+    headers = {"Authorization": f"Bearer {access_token}", "Content-Type": "application/json"}
+    data = {
+        "name": "goose location 1",
+        "notes": "i am a note",
+        "coords": "3 3",
+        "image": 'https://my-bucket-name.s3.amazonaws.com/folder1/image.jpg'
+    }
+    response = requests.post(f"{BASE_URL}/submit-sighting", headers=headers, json=data)
+    assert response.status_code == 400
+
+def test_submit_invalid_image_link_sighting():
+    """Test goose sighting submission with an invalid json schema"""
+    login_data = {"email": "test@test.com", "password": "test"}
+    login_response = requests.post(f"{BASE_URL}/login", json=login_data)
+    access_token = login_response.json().get("access_token")
+
+    assert access_token is not None
+
+    headers = {"Authorization": f"Bearer {access_token}", "Content-Type": "application/json"}
+    data = {
+        "name": "goose location 1",
+        "notes": "i am a note",
+        "coords": "34.0522,-118.2437",
+        "image": 'apple.com'
+    }
+    response = requests.post(f"{BASE_URL}/submit-sighting", headers=headers, json=data)
+    assert response.status_code == 400
 
 
 def test_protected_route_requires_auth():
