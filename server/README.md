@@ -73,10 +73,22 @@ To create a new migration, update the models in `app/models` and run:
 python -m flask db migrate -m "<Migration Name>"
 ```
 
+After creating the migration, upgrade the database:
+```bash
+python -m flask db upgrade
+```
+
 An easy way to view interact with the database is to run pgAdmin in docker:
 
 ```bash
 docker run --name pgadmin4 -p 8080:80 -e "PGADMIN_DEFAULT_EMAIL=user@example.com" -e "PGADMIN_DEFAULT_PASSWORD=admin" -d dpage/pgadmin4
+```
+
+Alternatively, if you can't get pgAdmin to work, you can inspect the database through command line:
+```bash
+docker exec -it "<postgres container name>" bash
+psql -U postgres
+\c honkspotter_db
 ```
 
 ### 5. Run the Application
