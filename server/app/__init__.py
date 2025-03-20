@@ -87,8 +87,10 @@ def create_app():
     # Register blueprints
     from app.auth.routes import auth_bp
     from app.main.routes import main_bp
+    from app.users.routes import users_bp
 
     app.register_blueprint(auth_bp, url_prefix="/api")
     app.register_blueprint(main_bp, url_prefix="/api")
+    app.register_blueprint(users_bp, url_prefix="/api")
 
     return app
