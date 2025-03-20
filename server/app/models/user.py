@@ -3,7 +3,6 @@ from app import db
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from werkzeug.security import generate_password_hash, check_password_hash
-from dataclasses import dataclass
 
 class User(db.Model):
     __tablename__ = "users"
