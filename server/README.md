@@ -61,6 +61,7 @@ docker run --name honkspotter_db \
   -p 5432:5432 -d postgres
 ```
 
+If you are initially setting up the app, do not create a migration, and skip to the next step.
 To create a new migration, update the models in `app/models` and run:
 
 ```bash
@@ -93,6 +94,15 @@ To run the application, use the following command:
 
 ```bash
 python -m flask run --port 8000
+```
+
+### 5. Run the tests
+
+BEFORE running the tests, create a user with email=test@test.com and password=test,
+or all the tests will fail if you start with an empty database
+
+```bash
+pytest
 ```
 
 This will start the Flask development server and you should be able to access the application at `http://localhost:8000`.
