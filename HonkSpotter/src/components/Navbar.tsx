@@ -5,6 +5,7 @@ import { useSnackbar } from 'notistack';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useEffect, useRef, useState } from 'react';
 import apiClient from '@/api/apiClient';
+import { ApiEndpoints } from '@/enums/apiEndpoints';
 
 const Navbar = () => {
   const { accessToken, clearAccessToken } = useAuthStore();
@@ -29,7 +30,7 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     try {
-      const response = await apiClient.post('/logout', {}, { withCredentials: true });
+      const response = await apiClient.post(ApiEndpoints.Logout, {}, { withCredentials: true });
       if (response.status === 200) {
         clearAccessToken();
         setDropdownOpen(false);

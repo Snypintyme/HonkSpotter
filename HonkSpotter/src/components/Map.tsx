@@ -27,8 +27,8 @@ const Map = ({ selectedSighting, setSelectedSighting }: MapProps) => {
   const [defaultSightingCenter, defaultSightingZoom] = useMemo(() => {
     if (initialMapLoaded === false && gooseSightings.length > 0) {
       // TODO: This only looks nice with the sample data, figure out a better way to default to a center
-      const lat = gooseSightings.reduce((acc, sighting) => acc + sighting.coordinate.lat, 0) / gooseSightings.length;
-      const lng = gooseSightings.reduce((acc, sighting) => acc + sighting.coordinate.lng, 0) / gooseSightings.length;
+      const lat = gooseSightings.reduce((acc, sighting) => acc + sighting.coords.lat, 0) / gooseSightings.length;
+      const lng = gooseSightings.reduce((acc, sighting) => acc + sighting.coords.lng, 0) / gooseSightings.length;
       const newCenter: LatLngExpression = [lat, lng];
       // NOTE: Hack required to get this to actually work for rerender reasons
       setTimeout(() => setInitialMapLoaded(true), 100);
@@ -40,7 +40,7 @@ const Map = ({ selectedSighting, setSelectedSighting }: MapProps) => {
   // When a valid sighting is selected, snap to selected sighting
   const [selectedSightingCenter, selectedSightingZoom] = useMemo(() => {
     if (selectedSighting) {
-      const newCenter: LatLngExpression = [selectedSighting.coordinate.lat, selectedSighting.coordinate.lng];
+      const newCenter: LatLngExpression = [selectedSighting.coords.lat, selectedSighting.coords.lng];
       return [newCenter, DEFAULT_SELECTED_ZOOM];
     }
     return [null, null];
@@ -59,7 +59,7 @@ const Map = ({ selectedSighting, setSelectedSighting }: MapProps) => {
       {gooseSightings.map((sighting) => (
         <Marker
           key={sighting.id}
-          position={[sighting.coordinate.lat, sighting.coordinate.lng]}
+          position={[sighting.coords.lat, sighting.coords.lng]}
           eventHandlers={{
             click: () => {
               setSelectedSighting(sighting);
@@ -72,7 +72,7 @@ const Map = ({ selectedSighting, setSelectedSighting }: MapProps) => {
             },
           }}
         >
-          <Popup closeButton={false}>{sighting.title}</Popup>
+          <Popup closeButton={false}>{sighting.name}</Popup>
         </Marker>
       ))}
     </MapContainer>

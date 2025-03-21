@@ -1,19 +1,28 @@
 import { useCallback, useEffect, useState } from 'react';
-import Map from '@/components/map';
-import { mockGooseSightings } from '@/utils/sampleData';
+import Map from '@/components/Map';
 import { useGooseSightingStore } from '@/store/useGooseSightingStore';
-import SightingList from '@/components/sightingList';
+import SightingList from '@/components/SightingList';
 import { GooseSighting } from '@/interfaces/gooseSighting';
-import SightingDetail from '@/components/sightingDetail';
+import SightingDetail from '@/components/SightingDetail';
+import { useQuery } from '@tanstack/react-query';
+import apiClient from '@/api/apiClient';
+import { ApiEndpoints } from '@/enums/apiEndpoints';
 
 const Homepage = () => {
   const { setGooseSightings: setGooseSightings } = useGooseSightingStore();
   const [selectedSighting, setSelectedSighting] = useState<GooseSighting | null>(null);
 
-  // TODO: fetch data from API
+  const { data: gooseSightings } = useQuery<GooseSighting[]>({
+    queryKey: ['sightings'],
+    queryFn: async () => {
+      const response = await apiClient.get(ApiEndpoints.GetSightings);
+      return response.data.sightings;
+    },
+  });
+
   useEffect(() => {
-    setGooseSightings(mockGooseSightings);
-  }, [setGooseSightings]);
+    setGooseSightings(gooseSightings ?? []);
+  }, [gooseSightings, setGooseSightings]);
 
   const onCloseSightingDetail = useCallback(() => {
     setSelectedSighting(null);

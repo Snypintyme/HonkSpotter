@@ -12,10 +12,10 @@ const SightingDetail = ({ sighting, onClose }: SightingDetailProps) => {
       <Button variant="link" onClick={onClose} className="text-blue-500 px-0">
         &larr; Back
       </Button>
-      <h3 className="text-xl font-bold mb-2">{sighting.title}</h3>
-      <p className="mb-2">{sighting.description}</p>
+      <h3 className="text-xl font-bold mb-2">{sighting.name}</h3>
+      <p className="mb-2">{sighting.notes}</p>
       <p className="text-sm text-gray-600">
-        Coordinates: {sighting.coordinate.lat}, {sighting.coordinate.lng}
+        Coordinates: {sighting.coords.lat}, {sighting.coords.lng}
       </p>
     </div>
   );
