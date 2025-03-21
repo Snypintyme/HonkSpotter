@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-- Python 3.x installed
+- Python 3.11.x installed
 - `pip` installed
 
 ## Getting Started
@@ -88,6 +88,12 @@ psql -U postgres
 \c honkspotter_db
 ```
 
+To seed the database with fake data, run the following command:
+
+```bash
+python seed_db.py
+```
+
 ### 5. Run the Application
 
 To run the application, use the following command:
@@ -95,17 +101,6 @@ To run the application, use the following command:
 ```bash
 python -m flask run --port 8000
 ```
-
-### 5. Run the tests
-
-BEFORE running the tests, create a user with email=test@test.com and password=test,
-or all the tests will fail if you start with an empty database
-
-```bash
-pytest
-```
-
-This will start the Flask development server and you should be able to access the application at `http://localhost:8000`.
 
 ## Testing
 
