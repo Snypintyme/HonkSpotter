@@ -28,7 +28,10 @@ jobs:
           pip install -r requirements.txt
           pip install safety pylint
 
-      - name: Run security static analysis
+      - name: Run Safety
         continue-on-error: true
-        run: |
-          pylint app/
+        run: safety check
+
+      - name: Run Pylint
+        continue-on-error: true
+        run: pylint app/
