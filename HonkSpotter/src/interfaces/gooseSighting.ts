@@ -1,10 +1,11 @@
 import { Coordinate } from './coordinate';
 
-// TODO: Add user who reported it
 export interface GooseSighting {
   id: string;
-  title: string;
-  description: string;
-  coordinate: Coordinate;
+  name: string;
+  notes?: string;
+  coords: Coordinate;
   image?: string;
+  user: string;
+  created_date: Date;
 }

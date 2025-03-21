@@ -7,3 +7,4 @@ psycopg2-binary==2.9.6
 Flask-Migrate==4.0.4
 requests
 pytest
+Faker
