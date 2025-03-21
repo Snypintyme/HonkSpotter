@@ -1,16 +1,17 @@
+"""Sighting model definition"""
 import uuid
 import re
 import datetime
-from app import db
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import validates, relationship
 from werkzeug.security import generate_password_hash, check_password_hash
-from sqlalchemy.orm import validates
 from dataclasses import dataclass
 from app.models.user import User
+from app import db
 
 @dataclass
 class Sighting(db.Model):
+    """Sighting record"""
     __tablename__ = "sightings"
     id: str
     name: str
@@ -31,6 +32,7 @@ class Sighting(db.Model):
 
     @validates('name')
     def validate_name(self, key, name):
+        """Validate name field"""
         if not isinstance(name, str):
             raise TypeError("Name must be a string")
         if not name.strip():
@@ -41,12 +43,14 @@ class Sighting(db.Model):
 
     @validates('notes')
     def validate_notes(self, key, notes):
+        """Validate observation notes"""
         if notes is not None and not isinstance(notes, str):
             raise TypeError("Notes must be a string")
         return notes
 
     @validates('coords')
     def validate_coords(self, key, coords):
+        """Validate coordinate format"""
         if not isinstance(coords, str):
             raise TypeError("Coordinates must be a string")
 
@@ -74,6 +78,7 @@ class Sighting(db.Model):
 
     @validates('image')
     def validate_image(self, key, image):
+        """Validate image format"""
         if image is None:
             return image
 

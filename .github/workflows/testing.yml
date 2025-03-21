@@ -34,4 +34,4 @@ jobs:
 
       - name: Run Pylint
         continue-on-error: true
-        run: pylint app/
+        run: pylint --disable=logging-fstring-interpolation app/
