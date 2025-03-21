@@ -72,8 +72,12 @@ def submit_sighting():
 
     except (TypeError, ValueError) as e:
         db.session.rollback()   # does nothing if no transaction occured
-        security_logger.error(f"Validation error: submit goose sighting - IP: {request.remote_addr}\n{e}")
-        debug_logger.error(f"Validation error: submit goose sighting\n{e}", exc_info=True)
+        security_logger.error(
+            f"Validation error: submit goose sighting - IP: {request.remote_addr}\n{e}"
+        )
+        debug_logger.error(
+            f"Validation error: submit goose sighting\n{e}", exc_info=True
+        )
         return jsonify({"error": "Invalid input"}), 400
     except Exception as e:
         db.session.rollback()  # does nothing if no transaction occured
