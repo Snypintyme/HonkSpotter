@@ -71,7 +71,7 @@ def submit_sighting():
         return response, 201
 
     except (TypeError, ValueError) as e:
-        db.session.rollback()   # does nothing if no transaction occured
+        db.session.rollback()  # does nothing if no transaction occured
         security_logger.error(
             f"Validation error: submit goose sighting - IP: {request.remote_addr}\n{e}"
         )
