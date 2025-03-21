@@ -1,3 +1,4 @@
+"""Main application routes"""
 import logging
 from flask import Blueprint, request, jsonify, make_response
 from flask_jwt_extended import jwt_required, get_jwt_identity
@@ -57,7 +58,8 @@ def submit_sighting():
         db.session.commit()
 
         debug_logger.debug(
-            f"Submit goose sighting by {current_user}, name='{name}', notes='{notes}', coords='{coords}', img link='{image}'"
+            f"Submit goose sighting by {current_user}, name='{name}', "
+            f"notes='{notes}', coords='{coords}', img link='{image}'"
         )
 
         response = make_response(

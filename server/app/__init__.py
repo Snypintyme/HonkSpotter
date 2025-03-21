@@ -1,3 +1,4 @@
+"""Flask application factory and configuration setup"""
 import os
 import logging
 from flask import Flask
@@ -5,8 +6,8 @@ from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from config import Config
 from dotenv import load_dotenv
+from config import Config
 
 # Load environment variables
 load_dotenv()
@@ -18,6 +19,7 @@ migrate = Migrate()
 
 
 def configure_logging(app):
+    """Configure logging handlers and formatters based on environment."""
     from logging.handlers import RotatingFileHandler
 
     # Ensure logs directory exists
@@ -66,6 +68,7 @@ def configure_logging(app):
 
 
 def create_app():
+    """Application factory function"""
     app = Flask(__name__)
     app.config.from_object(Config)
 
@@ -85,9 +88,9 @@ def create_app():
     configure_logging(app)
 
     # Register blueprints
-    from app.auth.routes import auth_bp
-    from app.main.routes import main_bp
-    from app.users.routes import users_bp
+    from app.auth.routes import auth_bp # pylint: disable=import-outside-toplevel
+    from app.main.routes import main_bp # pylint: disable=import-outside-toplevel
+    from app.users.routes import users_bp # pylint: disable=import-outside-toplevel
 
     app.register_blueprint(auth_bp, url_prefix="/api")
     app.register_blueprint(main_bp, url_prefix="/api")

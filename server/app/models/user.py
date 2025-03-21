@@ -1,10 +1,12 @@
+"""User model definition"""
 import uuid
-from app import db
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from werkzeug.security import generate_password_hash, check_password_hash
+from app import db
 
 class User(db.Model):
+    """User model for storing authentication and profile information"""
     __tablename__ = "users"
 
     id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
@@ -17,9 +19,11 @@ class User(db.Model):
     posts = relationship("Sighting", back_populates="user")
 
     def set_password(self, password_plaintext):
+        """Set hashed password"""
         self.password = generate_password_hash(password_plaintext)
 
     def check_password(self, password_plaintext):
+        """Verify password against hash"""
         return check_password_hash(self.password, password_plaintext)
 
     def __repr__(self):
