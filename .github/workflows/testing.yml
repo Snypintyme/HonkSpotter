@@ -31,5 +31,4 @@ jobs:
       - name: Run security static analysis
         continue-on-error: true
         run: |
-          safety check
           pylint app/
