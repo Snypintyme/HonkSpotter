@@ -62,11 +62,12 @@ def submit_sighting():
             f"notes='{notes}', coords='{coords}', img link='{image}'"
         )
 
+        sighting_dict = goose_sighting.to_dict()
         response = make_response(
             jsonify(
                 {
                     "msg": "Successfully submitted goose sighting",
-                    "id": str(goose_sighting.id),
+                    "sighting": sighting_dict,
                 }
             )
         )
@@ -105,39 +106,7 @@ def sightings():
         # Convert the sightings to a list of dictionaries
         sightings_list = []
         for sighting in goose_sightings:
-            # Convert the sighting to a dict
-            sighting_dict = {
-                "id": str(sighting.id),
-                "name": sighting.name,
-                "notes": sighting.notes,
-                "image": sighting.image,
-                "created_date": (
-                    sighting.created_date.isoformat() if sighting.created_date else None
-                ),
-            }
-
-            # Parse the coordinates string into lat/lng object
-            if sighting.coords:
-                lat_str, lng_str = sighting.coords.split(",")
-                sighting_dict["coords"] = {
-                    "lat": float(lat_str.strip()),
-                    "lng": float(lng_str.strip()),
-                }
-            else:
-                sighting_dict["coords"] = None
-
-            # Include the full user object instead of just the ID
-            if sighting.user:
-                sighting_dict["user"] = {
-                    "id": str(sighting.user.id),
-                    "email": sighting.user.email,
-                    "username": sighting.user.username,
-                    "description": sighting.user.description,
-                    "profile_picture": sighting.user.profile_picture,
-                }
-            else:
-                sighting_dict["user"] = None
-
+            sighting_dict = sighting.to_dict()
             sightings_list.append(sighting_dict)
 
         debug_logger.debug(

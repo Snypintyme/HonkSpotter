@@ -95,3 +95,39 @@ class Sighting(db.Model):
             raise ValueError("Image must be a valid S3 bucket link")
 
         return image
+
+    def to_dict(self):
+        # Convert the sighting to a dict
+        sighting_dict = {
+            "id": str(self.id),
+            "name": self.name,
+            "notes": self.notes,
+            "image": self.image,
+            "created_date": (
+                self.created_date.isoformat() if self.created_date else None
+            ),
+        }
+
+        # Parse the coordinates string into lat/lng object
+        if self.coords:
+            lat_str, lng_str = self.coords.split(",")
+            sighting_dict["coords"] = {
+                "lat": float(lat_str.strip()),
+                "lng": float(lng_str.strip()),
+            }
+        else:
+            sighting_dict["coords"] = None
+
+        # Include the full user object instead of just the ID
+        if self.user:
+            sighting_dict["user"] = {
+                "id": str(self.user.id),
+                "email": self.user.email,
+                "username": self.user.username,
+                "description": self.user.description,
+                "profile_picture": self.user.profile_picture,
+            }
+        else:
+            sighting_dict["user"] = None
+
+        return sighting_dict
