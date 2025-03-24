@@ -1,11 +1,12 @@
 import { useGooseSightingStore } from '@/store/useGooseSightingStore';
 import { useState } from "react";
 import { Button } from '@/components/ui/button'
-import { Input, Label, Textarea } from '@/components/ui/input'
+import { Input, Textarea } from '@/components/ui/input'
 import { GooseSighting } from '@/interfaces/gooseSighting';
 import apiClient from '@/api/apiClient';
 import { ApiEndpoints } from '@/enums/apiEndpoints';
 import { AxiosError } from 'axios';
+import { Label } from './ui/label';
 
 interface ReportSightingProps {
   onClose: () => void;

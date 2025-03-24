@@ -40,22 +40,4 @@ const Textarea: React.FC<TextareaProps> = ({ name, placeholder, value, onChange,
   );
 };
 
-interface LabelProps {
-  htmlFor: string;
-  children?: React.ReactNode;
-}
-
-function Label({ htmlFor, children }: LabelProps) {
-  return (
-    <div className="mb-1">
-      <label 
-        className="text-md font-medium text-gray-700"
-        htmlFor={htmlFor}
-      >
-        {children}
-      </label>
-    </div>
-  );
-}
-
-export { Input, Textarea, Label }
+export { Input, Textarea }
