@@ -33,7 +33,6 @@ const ReportSighting = ({ onClose } : ReportSightingProps) => {
 
   const handleSubmit = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
     // Handle form submission (e.g., send data to an API)
     const postData = {
       name: formData.name,
@@ -43,8 +42,8 @@ const ReportSighting = ({ onClose } : ReportSightingProps) => {
     };
 
     try {
-      const response = await apiClient.post(ApiEndpoints.SubmitSighting, postData)
-      const sighting = await response.data;
+      const response = await apiClient.post(ApiEndpoints.SubmitSighting, postData, {withCredentials: true})
+      const sighting = await response.data.sighting;
       const gooseSighting: GooseSighting = {
         id: sighting.id,
         name: sighting.name,

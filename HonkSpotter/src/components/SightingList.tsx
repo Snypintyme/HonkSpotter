@@ -7,7 +7,6 @@ interface SightingListProps {
 
 const SightingList = ({ onClickSelectedSighting }: SightingListProps) => {
   const { gooseSightings } = useGooseSightingStore();
-  console.log('aaa', gooseSightings);
   return (
     <>
       <h2 className="text-2xl font-bold mb-4">{`${gooseSightings.length} Reported Sightings`}</h2>
