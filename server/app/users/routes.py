@@ -9,11 +9,66 @@ security_logger = logging.getLogger("security")
 debug_logger = logging.getLogger("debug")
 
 
+@users_bp.route("/user/<uuid:user_id>", methods=["GET"])
+@jwt_required()
+def get_user(user_id):
+    """
+    GET /api/user/<user_id>
+    Returns information for a specific user
+    """
+    try:
+        current_user_email = get_jwt_identity()
+        security_logger.info(
+            f"Get user attempt - User ID: {user_id}, IP: {request.remote_addr}"
+        )
+
+        # Verify the requesting user exists
+        requesting_user = User.query.filter_by(email=current_user_email).first()
+        if not requesting_user:
+            security_logger.warning(
+                f"Requesting user not found for get user request - IP: {request.remote_addr}"
+            )
+            return jsonify({"error": "Requesting user not found"}), 404
+
+        # Get the requested user from database
+        user = User.query.get(user_id)
+        if not user:
+            security_logger.warning(
+                f"Requested user not found - User ID: {user_id}, IP: {request.remote_addr}"
+            )
+            return jsonify({"error": "Requested user not found"}), 404
+
+        # Format user data, excluding sensitive information
+        user_data = {
+            "id": str(user.id),
+            "username": user.username,
+            "description": user.description,
+            "profile_picture": user.profile_picture,
+            "is_banned": user.is_banned,
+        }
+
+        debug_logger.debug(
+            f"User {current_user_email} retrieved user {user_id} successfully"
+        )
+        security_logger.info(
+            f"User retrieved successfully - User ID: {user_id}, IP: {request.remote_addr}"
+        )
+
+        return jsonify({"user": user_data}), 200
+
+    except Exception as e:
+        security_logger.error(
+            f"Get user error - User ID: {user_id}, IP: {request.remote_addr}"
+        )
+        debug_logger.error(f"Get user error: {str(e)}", exc_info=True)
+        return jsonify({"error": "Internal server error"}), 500
+
+
 @users_bp.route("/update-profile", methods=["POST"])
 @jwt_required()
 def update_profile():
     """
-    POST /api/update-profile
+    POST /api/user/update-profile
     Updates user profile information (username, description, profile_picture)
     """
     try:
