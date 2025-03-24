@@ -18,4 +18,26 @@ function Input({ className, type, ...props }: React.ComponentProps<"input">) {
   )
 }
 
-export { Input }
+interface TextareaProps {
+  name: string;
+  placeholder: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  required?: boolean;
+  className?: string;
+}
+
+const Textarea: React.FC<TextareaProps> = ({ name, placeholder, value, onChange, required, className }) => {
+  return (
+    <textarea
+      name={name}
+      placeholder={placeholder}
+      value={value}
+      onChange={onChange}
+      required={required}
+      className={`w-full p-2 border rounded ${className}`}
+    />
+  );
+};
+
+export { Input, Textarea }
