@@ -79,7 +79,8 @@ class Sighting(db.Model):
     @validates('image')
     def validate_image(self, key, image):
         """Validate image format"""
-        if image is None:
+        print(image)
+        if not image:
             return image
 
         if not isinstance(image, str):
@@ -92,6 +93,6 @@ class Sighting(db.Model):
         match = re.match(s3_pattern, image)
 
         if not match:
-            raise ValueError("Image must be a valid S3 bucket link")
+            raise ValueError(f"Image must be a valid S3 bucket link, got {image}")
 
         return image

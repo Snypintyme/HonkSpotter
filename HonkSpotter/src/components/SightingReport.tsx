@@ -39,7 +39,7 @@ const ReportSighting = ({ onClose } : ReportSightingProps) => {
       name: formData.name,
       notes: formData.notes,
       coords: `${formData.lat},${formData.lng}`,
-      image: formData.image,
+      image: 'https://bucket-name.s3.amazonaws.com/test/img/link',  // formData.image, comment out until img upload works
     };
 
     try {
