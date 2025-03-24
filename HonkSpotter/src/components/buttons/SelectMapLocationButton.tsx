@@ -16,17 +16,5 @@ export default function SelectMapLocationButton({ onClick }: SelectMapLocationBu
         <MapPin color="red"/>
       </Button>
     </div>
-    // <div className="fixed z-99999 bottom-8 right-4">
-    //   <Tooltip id="button-tooltip"/>
-    //   <Button
-    //     className="w-14 h-14 rounded-full shadow-lg bg-red-600 hover:bg-red-700"
-    //     onClick={onClick}
-    //     data-tooltip-id="button-tooltip"
-    //     data-tooltip-place="top"
-    //     data-tooltip-content="Report goose sighting"
-    //   >
-    //     <Plus size={24} className="text-white" />
-    //   </Button>
-    // </div>
   );
 }

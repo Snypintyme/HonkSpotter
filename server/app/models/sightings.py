@@ -79,7 +79,6 @@ class Sighting(db.Model):
     @validates('image')
     def validate_image(self, key, image):
         """Validate image format"""
-        print(image)
         if not image:
             return image
 
