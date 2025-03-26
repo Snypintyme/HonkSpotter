@@ -1,6 +1,6 @@
 // import { TanStackRouterDevtools } from '@tanstack/router-devtools';
 import { Outlet } from '@tanstack/react-router';
-import Navbar from './components/navbar';
+import Navbar from './components/Navbar';
 
 function App() {
   return (

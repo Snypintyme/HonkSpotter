@@ -10,6 +10,19 @@ const getCookieValue = (name: string): string | null => {
   return matches ? decodeURIComponent(matches[1]) : null;
 };
 
+export const refreshAccessToken = async (): Promise<string> => {
+  const accessToken = useAuthStore.getState().accessToken;
+  const csrfToken = getCookieValue('csrf_refresh_token');
+  const refreshResponse = await axios.post(
+    `${apiURL}/api/refresh`,
+    { access_token: accessToken },
+    { withCredentials: true, headers: { 'X-CSRF-TOKEN': csrfToken } }
+  );
+  const newAccessToken = refreshResponse.data.access_token;
+  useAuthStore.getState().setAccessToken(newAccessToken);
+  return newAccessToken;
+};
+
 const apiURL = 'http://localhost:8000';
 const apiClient = axios.create({
   baseURL: `${apiURL}/api`, // TODO: move to env
@@ -46,16 +59,7 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
-        const accessToken = useAuthStore.getState().accessToken;
-        const csrfToken = getCookieValue('csrf_refresh_token');
-        const refreshResponse = await axios.post(
-          `${apiURL}/api/refresh`,
-          { access_token: accessToken },
-          { withCredentials: true, headers: { 'X-CSRF-TOKEN': csrfToken } }
-        );
-        const newAccessToken = refreshResponse.data.access_token;
-        useAuthStore.getState().setAccessToken(newAccessToken);
-
+        const newAccessToken = await refreshAccessToken();
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
         return apiClient(originalRequest);
       } catch (refreshError) {

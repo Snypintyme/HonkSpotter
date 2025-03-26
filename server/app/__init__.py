@@ -1,4 +1,5 @@
 """Flask application factory and configuration setup"""
+
 import os
 import logging
 from flask import Flask
@@ -80,17 +81,18 @@ def create_app():
     # TODO: Fix this for prod (adjust origins for production)
     CORS(
         app,
-        resources={r"/api/*": {"origins": "http://localhost:5173"}},
+        resources={r"/api/.*": {"origins": "http://localhost:5173"}},
         supports_credentials=True,
+        automatic_options=True,
     )
 
     # Configure logging
     configure_logging(app)
 
     # Register blueprints
-    from app.auth.routes import auth_bp # pylint: disable=import-outside-toplevel
-    from app.main.routes import main_bp # pylint: disable=import-outside-toplevel
-    from app.users.routes import users_bp # pylint: disable=import-outside-toplevel
+    from app.auth.routes import auth_bp  # pylint: disable=import-outside-toplevel
+    from app.main.routes import main_bp  # pylint: disable=import-outside-toplevel
+    from app.users.routes import users_bp  # pylint: disable=import-outside-toplevel
 
     app.register_blueprint(auth_bp, url_prefix="/api")
     app.register_blueprint(main_bp, url_prefix="/api")
