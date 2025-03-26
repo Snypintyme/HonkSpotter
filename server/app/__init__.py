@@ -81,8 +81,9 @@ def create_app():
     # TODO: Fix this for prod (adjust origins for production)
     CORS(
         app,
-        resources={r"/api/*": {"origins": "http://localhost:5173"}},
+        resources={r"/api/.*": {"origins": "http://localhost:5173"}},
         supports_credentials=True,
+        automatic_options=True,
     )
 
     # Configure logging

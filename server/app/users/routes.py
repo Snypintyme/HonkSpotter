@@ -3,19 +3,25 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from app import db
 from app.models.user import User
+import uuid
 
 users_bp = Blueprint("users", __name__)
 security_logger = logging.getLogger("security")
 debug_logger = logging.getLogger("debug")
 
 
-@users_bp.route("/user/<uuid:user_id>", methods=["GET"])
+@users_bp.route("/user/<string:user_id>", methods=["GET"])
 @jwt_required()
 def get_user(user_id):
     """
     GET /api/user/<user_id>
     Returns information for a specific user
     """
+    try:
+        uuid_obj = uuid.UUID(user_id)
+    except ValueError:
+        return jsonify({"error": "Invalid user ID format"}), 404
+
     try:
         current_user_email = get_jwt_identity()
         security_logger.info(

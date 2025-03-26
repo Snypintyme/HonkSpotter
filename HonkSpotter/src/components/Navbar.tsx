@@ -6,6 +6,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { useEffect, useRef, useState } from 'react';
 import apiClient from '@/api/apiClient';
 import { ApiEndpoints } from '@/enums/apiEndpoints';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 const Navbar = () => {
   const { accessToken, clearAccessToken } = useAuthStore();
@@ -82,9 +83,10 @@ const Navbar = () => {
             </Button>
             {accessToken ? (
               <div className="relative" ref={dropdownRef}>
-                <Button variant="default" onClick={() => setDropdownOpen((prev) => !prev)}>
-                  User
-                </Button>
+                <Avatar onClick={() => setDropdownOpen((prev) => !prev)}>
+                  <AvatarImage src="https://github.com/shadcn.png" />
+                  <AvatarFallback>CN</AvatarFallback>
+                </Avatar>
                 {dropdownOpen && (
                   <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 shadow-lg z-1000">
                     <button
