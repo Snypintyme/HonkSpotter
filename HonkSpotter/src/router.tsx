@@ -1,8 +1,10 @@
-import { createRootRoute, createRoute, createRouter } from '@tanstack/react-router';
+import { createRootRoute, createRoute, createRouter, Link } from '@tanstack/react-router';
 import App from './App';
 import Homepage from './pages/Homepage';
-import Authentication from './pages/authentication';
+import Authentication from './pages/Authentication';
 import { AuthType } from './enums/authType';
+import UserProfile from './pages/UserProfile';
+import AuthGuard from './components/AuthGuard';
 
 const rootRoute = createRootRoute({
   component: App,
@@ -26,8 +28,39 @@ const signupRoute = createRoute({
   component: () => <Authentication authType={AuthType.Signup} />,
 });
 
-const routeTree = rootRoute.addChildren([indexRoute, loginRoute, signupRoute]);
+const userProfileRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/user/$userId',
+  component: () => (
+    <AuthGuard>
+      <UserProfile />
+    </AuthGuard>
+  ),
+});
 
-const router = createRouter({ routeTree });
+const routeTree = rootRoute.addChildren([indexRoute, loginRoute, signupRoute, userProfileRoute]);
+
+const router = createRouter({
+  routeTree,
+  defaultNotFoundComponent: () => {
+    return (
+      <div className="min-h-screen min-w-screen flex items-center justify-center bg-gray-50">
+        <div className="max-w-md w-full text-center">
+          <h1 className="text-9xl font-extrabold text-indigo-600">404</h1>
+          <h2 className="mt-2 text-3xl font-bold text-gray-900 tracking-tight">Page not found</h2>
+          <p className="mt-4 text-lg text-gray-500">Sorry, we couldn't find the page you're looking for.</p>
+          <div className="mt-8">
+            <Link
+              to="/"
+              className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
+            >
+              Return to homepage
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  },
+});
 
 export default router;
