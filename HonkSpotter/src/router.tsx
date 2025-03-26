@@ -1,6 +1,6 @@
 import { createRootRoute, createRoute, createRouter } from '@tanstack/react-router';
 import App from './App';
-import Homepage from './pages/homepage';
+import Homepage from './pages/Homepage';
 import Authentication from './pages/authentication';
 import { AuthType } from './enums/authType';
 
