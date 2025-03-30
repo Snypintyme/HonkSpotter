@@ -24,3 +24,4 @@ class Config:
 
     # Environment setting
     FLASK_ENV = os.getenv("FLASK_ENV", "development")
+
