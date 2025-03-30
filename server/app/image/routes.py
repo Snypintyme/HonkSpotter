@@ -116,17 +116,14 @@ def delete_image(image_id):
     DELETE /api/image-delete
     Deletes an image from S3
     """
-    print(image_id)
     try:
         if not image_id:
             return jsonify({"error": "Image id is required"}), 400
 
-        print(1)
         image = Image.query.filter_by(id=image_id).first()
-        print(2)
         if not image:
             return jsonify({"error": "Image id not found"}), 400
-        print("found", image)
+
         s3_path = image.s3_url.split(f"https://{S3_BUCKET_NAME}.s3.amazonaws.com/")[-1]
         s3_client.delete_object(Bucket=S3_BUCKET_NAME, Key=s3_path)
 
