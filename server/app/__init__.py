@@ -78,8 +78,8 @@ def create_app():
 
     # Enable CORS for API endpoints
     # TODO: Fix this for prod (adjust origins for production)
-    origin_http = "http://honkspotter.rocks:5173" if app.config['IS_PROD'] else "http://localhost:5174"
-    origin_https = "https://honkspotter.rocks:5173" if app.config['IS_PROD'] else "https://localhost:5174"
+    origin_http = "http://honkspotter.rocks" if app.config['IS_PROD'] else "http://localhost:5174"
+    origin_https = "https://honkspotter.rocks" if app.config['IS_PROD'] else "https://localhost:5174"
     CORS(
         app,
         resources={r"/api/*": {"origins": [origin_http, origin_https]}},
