@@ -4,7 +4,7 @@ import logging
 import uuid
 import io
 
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 from flask_jwt_extended import jwt_required
 from app.models.images import Image
 from app import db
@@ -14,18 +14,47 @@ image_bp = Blueprint("image_upload", __name__)
 debug_logger = logging.getLogger("debug")
 
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
-S3_SECRET_KEY=os.getenv('S3_SECRET_KEY')
-S3_ACCESS_KEY=os.getenv('S3_ACCESS_KEY')
-S3_BUCKET_NAME=os.getenv('S3_BUCKET_NAME')
-S3_REGION=os.getenv('S3_REGION', 'us-east-1')
-s3_client = boto3.client(
-    "s3",
-    aws_access_key_id=S3_ACCESS_KEY,
-    aws_secret_access_key=S3_SECRET_KEY,
-    region_name=S3_REGION,
-)
 
-IS_LOCAL = True
+def get_client():
+    is_prod = current_app.config['IS_PROD']
+    s3_region = current_app.config['S3_REGION']
+    s3_access_key = current_app.config['S3_ACCESS_KEY']
+    s3_secret_key = get_secret() if is_prod else os.getenv('S3_SECRET_KEY')
+
+    if not is_prod and not s3_secret_key:
+        debug_logger.error(f"Local S3 secret key not set properly in environment variable")
+        raise Exception('Local environment variables not set properly')
+
+    return boto3.client(
+        "s3",
+        aws_access_key_id=s3_access_key,
+        aws_secret_access_key=s3_secret_key,
+        region_name=s3_region,
+    )
+
+def get_secret():
+    secret_name = "honks3secret"
+    region_name = "us-east-1"
+
+    # Create a Secrets Manager client
+    session = boto3.session.Session()
+    client = session.client(
+        service_name='secretsmanager',
+        region_name=region_name
+    )
+
+    try:
+        get_secret_value_response = client.get_secret_value(
+            SecretId=secret_name
+        )
+    except ClientError as e:
+        # For a list of exceptions thrown, see
+        # https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_GetSecretValue.html
+        raise e
+
+    secret = get_secret_value_response['SecretString']
+
+    return secret
 
 def allowed_file(filename):
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -75,9 +104,8 @@ def upload_image():
     Uploads an image file to S3 and returns its URL
     """
     try:
-        if IS_LOCAL and (not S3_BUCKET_NAME or not S3_SECRET_KEY or not S3_ACCESS_KEY):
-            debug_logger.error(f"Local AWS environment variables not set properly")
-            raise Exception('Local environment variables not set properly')
+        s3_client = get_client()
+        s3_bucket_name = current_app.config['S3_BUCKET_NAME']
 
         if "image" not in request.files:
             return jsonify({"error": "No file part"}), 400
@@ -101,9 +129,9 @@ def upload_image():
         if sanitized_image is None:
             return jsonify({"error": "Could not process image"}), 400
 
-        s3_client.upload_fileobj(sanitized_image, S3_BUCKET_NAME, s3_path, ExtraArgs={"ACL": "public-read", "ContentType": file.content_type})
+        s3_client.upload_fileobj(sanitized_image, s3_bucket_name, s3_path, ExtraArgs={"ACL": "public-read", "ContentType": file.content_type})
 
-        image_url = f"https://{S3_BUCKET_NAME}.s3.amazonaws.com/{s3_path}"
+        image_url = f"https://{s3_bucket_name}.s3.amazonaws.com/{s3_path}"
         image = Image(id=image_id, s3_url=image_url)
         db.session.add(image)
         db.session.commit()
@@ -123,6 +151,9 @@ def delete_image(image_id):
     Deletes an image from S3
     """
     try:
+        s3_client = get_client()
+        s3_bucket_name = current_app.config['S3_BUCKET_NAME']
+
         if not image_id:
             return jsonify({"error": "Image id is required"}), 400
 
@@ -130,8 +161,8 @@ def delete_image(image_id):
         if not image:
             return jsonify({"error": "Image id not found"}), 400
 
-        s3_path = image.s3_url.split(f"https://{S3_BUCKET_NAME}.s3.amazonaws.com/")[-1]
-        s3_client.delete_object(Bucket=S3_BUCKET_NAME, Key=s3_path)
+        s3_path = image.s3_url.split(f"https://{s3_bucket_name}.s3.amazonaws.com/")[-1]
+        s3_client.delete_object(Bucket=s3_bucket_name, Key=s3_path)
 
         Image.query.filter_by(id=image_id).delete()
         db.session.commit()
@@ -150,6 +181,9 @@ def get_image(image_id):
     Retrieves the actual image file from S3 based on image ID
     """
     try:
+        s3_client = get_client()
+        s3_bucket_name = current_app.config['S3_BUCKET_NAME']
+
         if not image_id:
             return jsonify({"error": "Image id is required"}), 400
 
@@ -157,7 +191,7 @@ def get_image(image_id):
         if not image:
             return jsonify({"error": "Image not found"}), 404
 
-        s3_path = image.s3_url.split(f"https://{S3_BUCKET_NAME}.s3.amazonaws.com/")[-1]
+        s3_path = image.s3_url.split(f"https://{s3_bucket_name}.s3.amazonaws.com/")[-1]
 
         # Get the file extension to determine content type
         file_extension = s3_path.split('.')[-1].lower()
@@ -169,7 +203,7 @@ def get_image(image_id):
         }
         content_type = content_types.get(file_extension, 'application/octet-stream')
 
-        file_obj = s3_client.get_object(Bucket=S3_BUCKET_NAME, Key=s3_path)
+        file_obj = s3_client.get_object(Bucket=s3_bucket_name, Key=s3_path)
         file_data = file_obj['Body'].read()
 
         from flask import send_file, Response
