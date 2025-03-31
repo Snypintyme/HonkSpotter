@@ -25,6 +25,8 @@ s3_client = boto3.client(
     region_name=S3_REGION,
 )
 
+IS_LOCAL = True
+
 def allowed_file(filename):
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
 
@@ -73,6 +75,10 @@ def upload_image():
     Uploads an image file to S3 and returns its URL
     """
     try:
+        if IS_LOCAL and (not S3_BUCKET_NAME or not S3_SECRET_KEY or not S3_ACCESS_KEY):
+            debug_logger.error(f"Local AWS environment variables not set properly")
+            raise Exception('Local environment variables not set properly')
+
         if "image" not in request.files:
             return jsonify({"error": "No file part"}), 400
 

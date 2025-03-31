@@ -7,6 +7,7 @@ import apiClient from '@/api/apiClient';
 import { ApiEndpoints } from '@/enums/apiEndpoints';
 import { AxiosError } from 'axios';
 import { Label } from './ui/label';
+import ImageUpload from './ImageUpload';
 
 interface ReportSightingProps {
   onClose: () => void;
@@ -22,18 +23,15 @@ const ReportSighting = ({ onClose } : ReportSightingProps) => {
     lng: "",
     image: "",
   });
-  const [preview, setPreview] = useState<string>('');
 
   const handleChange = (e: { target: { name: string; value: string; }; }) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
-    setPreview(URL.createObjectURL(file));
 
     const fileUploadData = new FormData();
     fileUploadData.append("image", file);
@@ -62,7 +60,6 @@ const ReportSighting = ({ onClose } : ReportSightingProps) => {
 
     if (response.status == 200) {
       setFormData((prev) => ({ ...prev, image: ''}));
-      setPreview('');
     }
   }
 
@@ -121,16 +118,7 @@ const ReportSighting = ({ onClose } : ReportSightingProps) => {
 
 
       <Label htmlFor="image">Image</Label>
-      <Input name="image" type="file" accept="image/*" onChange={handleImageChange} />
-      {preview ? (
-        <div>
-          <img src={preview} alt="Preview" style={{ width: "200px", height: "auto" }} />
-          <button onClick={onDeleteImage}>Delete</button>
-
-        </div>
-      ) :
-        undefined
-      }
+      <ImageUpload onImageChange={onImageChange} onDeleteImage={onDeleteImage} />
       <Button 
         type="submit"
         className="w-fit bg-green-400 hover:bg-green-500 mt-auto"
