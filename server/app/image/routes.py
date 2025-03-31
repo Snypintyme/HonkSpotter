@@ -129,7 +129,7 @@ def upload_image():
         if sanitized_image is None:
             return jsonify({"error": "Could not process image"}), 400
 
-        s3_client.upload_fileobj(sanitized_image, s3_bucket_name, s3_path, ExtraArgs={"ACL": "public-read", "ContentType": file.content_type})
+        s3_client.upload_fileobj(sanitized_image, s3_bucket_name, s3_path)
 
         image_url = f"https://{s3_bucket_name}.s3.amazonaws.com/{s3_path}"
         image = Image(id=image_id, s3_url=image_url)
