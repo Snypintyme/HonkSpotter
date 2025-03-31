@@ -54,7 +54,7 @@ def get_secret():
 
     secret = get_secret_value_response['SecretString']
 
-    return secret
+    return secret['honk-s3-secret']
 
 def allowed_file(filename):
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
