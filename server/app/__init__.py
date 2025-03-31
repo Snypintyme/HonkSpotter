@@ -78,9 +78,10 @@ def create_app():
 
     # Enable CORS for API endpoints
     # TODO: Fix this for prod (adjust origins for production)
+    origin = "https://honkspotter.rocks" if app.config['IS_PROD'] else "http://localhost:5174"
     CORS(
         app,
-        resources={r"/api/*": {"origins": "http://localhost:5173"}},
+        resources={r"/api/*": {"origins": origin}},
         supports_credentials=True,
     )
 

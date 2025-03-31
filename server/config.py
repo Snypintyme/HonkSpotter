@@ -25,3 +25,7 @@ class Config:
     # Environment setting
     FLASK_ENV = os.getenv("FLASK_ENV", "development")
 
+    IS_PROD = False
+    S3_ACCESS_KEY = 'AKIA5G2VGJNA5EFDYWUI'
+    S3_BUCKET_NAME = 'honk-spotter'
+    S3_REGION = 'us-east-1'
