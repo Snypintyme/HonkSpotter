@@ -97,6 +97,7 @@ def sanitize_image(file_stream, s3_filename):
         debug_logger.error(f"Error processing image: {e}")
         return None
 
+
 @image_bp.route("/image-upload", methods=["POST"])
 @jwt_required()
 def upload_image():
