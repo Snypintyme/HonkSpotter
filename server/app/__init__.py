@@ -91,9 +91,11 @@ def create_app():
     from app.auth.routes import auth_bp # pylint: disable=import-outside-toplevel
     from app.main.routes import main_bp # pylint: disable=import-outside-toplevel
     from app.users.routes import users_bp # pylint: disable=import-outside-toplevel
+    from app.image.routes import image_bp # pylint: disable=import-outside-toplevel
 
     app.register_blueprint(auth_bp, url_prefix="/api")
     app.register_blueprint(main_bp, url_prefix="/api")
     app.register_blueprint(users_bp, url_prefix="/api")
+    app.register_blueprint(image_bp, url_prefix="/api")
 
     return app

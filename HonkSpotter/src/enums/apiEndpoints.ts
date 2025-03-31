@@ -6,4 +6,5 @@ export const enum ApiEndpoints {
   SubmitSighting = '/submit-sighting',
   UpdateProfile = '/update-profile',
   Refresh = '/refresh',
+  ImageUpload = '/image-upload'
 }

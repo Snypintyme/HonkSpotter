@@ -7,6 +7,7 @@ import apiClient from '@/api/apiClient';
 import { ApiEndpoints } from '@/enums/apiEndpoints';
 import { AxiosError } from 'axios';
 import { Label } from './ui/label';
+import ImageUpload from './ImageUpload';
 
 interface ReportSightingProps {
   onClose: () => void;
@@ -28,9 +29,39 @@ const ReportSighting = ({ onClose } : ReportSightingProps) => {
     setFormData({ ...formData, [name]: value });
   };
 
-  // const handleImageChange = (e: { target: { files: string[]; }; }) => {
-  //   setFormData({ ...formData, image: e.target.files[0] });
-  // };
+  const onImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const fileUploadData = new FormData();
+    fileUploadData.append("image", file);
+
+    try {
+      const response = await apiClient.post(ApiEndpoints.ImageUpload, fileUploadData, {
+        headers: { "Content-Type": "multipart/form-data" },
+        withCredentials: true,
+      });
+
+      // Delete existing image if exists
+      if (formData.image) {
+        await apiClient.delete(`/image-delete/${formData.image}`, { withCredentials: true });
+      }
+
+      setFormData((prev) => ({ ...prev, image: response.data.id }));
+    } catch (error) {
+      console.error("Image upload failed", error);
+    }
+  };
+
+  const onDeleteImage = async( e: { preventDefault: () => void; }) => {
+    e.preventDefault();
+
+    const response = await apiClient.delete(`/image-delete/${formData.image}`, { withCredentials: true });
+
+    if (response.status == 200) {
+      setFormData((prev) => ({ ...prev, image: ''}));
+    }
+  }
 
   const handleSubmit = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
@@ -39,7 +70,7 @@ const ReportSighting = ({ onClose } : ReportSightingProps) => {
       name: formData.name,
       notes: formData.notes,
       coords: `${formData.lat},${formData.lng}`,
-      image: 'https://bucket-name.s3.amazonaws.com/test/img/link',  // formData.image, comment out until img upload works
+      image: formData.image,
     };
 
     try {
@@ -87,8 +118,7 @@ const ReportSighting = ({ onClose } : ReportSightingProps) => {
 
 
       <Label htmlFor="image">Image</Label>
-      <Input name="image" type="file" accept="image/*" onChange={() => {}} />
-
+      <ImageUpload onImageChange={onImageChange} onDeleteImage={onDeleteImage} />
       <Button 
         type="submit"
         className="w-fit bg-green-400 hover:bg-green-500 mt-auto"

@@ -78,21 +78,12 @@ class Sighting(db.Model):
 
     @validates('image')
     def validate_image(self, key, image):
-        """Validate image format"""
+        """Validate image id"""
         if not image:
             return image
 
         if not isinstance(image, str):
             raise TypeError("Image URL must be a string")
-
-        # Validate S3 bucket link format
-        # Example: https://bucket-name.s3.amazonaws.com/path/to/object
-        # or: https://s3.amazonaws.com/bucket-name/path/to/object
-        s3_pattern = r'^https?://(?:([^.]+)\.s3\.amazonaws\.com/|s3\.amazonaws\.com/([^/]+)/)'
-        match = re.match(s3_pattern, image)
-
-        if not match:
-            raise ValueError(f"Image must be a valid S3 bucket link, got {image}")
 
         return image
 
