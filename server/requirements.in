@@ -8,5 +8,5 @@ Flask-Migrate==4.0.4
 requests
 pytest
 Faker
-boto3
+boto3==1.37.23
 pillow
