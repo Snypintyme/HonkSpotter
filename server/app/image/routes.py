@@ -3,6 +3,7 @@ import boto3
 import logging
 import uuid
 import io
+import json
 
 from flask import Blueprint, request, jsonify, current_app
 from flask_jwt_extended import jwt_required
@@ -52,7 +53,7 @@ def get_secret():
         # https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_GetSecretValue.html
         raise e
 
-    secret = get_secret_value_response['SecretString']
+    secret = json.loads(get_secret_value_response['SecretString'])
 
     return secret['honk-s3-secret']
 
