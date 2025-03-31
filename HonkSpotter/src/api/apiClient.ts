@@ -9,8 +9,8 @@ const getCookieValue = (name: string): string | null => {
   );
   return matches ? decodeURIComponent(matches[1]) : null;
 };
-
-const apiURL = 'http://localhost:8000';
+const isProd = false;
+const apiURL = isProd ? 'https://honkspotter.rocks' : 'http://localhost:8000';
 const apiClient = axios.create({
   baseURL: `${apiURL}/api`, // TODO: move to env
   withCredentials: true,
