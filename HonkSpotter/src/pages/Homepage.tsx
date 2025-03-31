@@ -34,6 +34,12 @@ const Homepage = () => {
     setGooseSightings(gooseSightings ?? []);
   }, [gooseSightings, setGooseSightings]);
 
+  useEffect(() => {
+    if (selectedSighting) {
+      setActiveComponent(ActiveComponent.SightingDetail);
+    }
+  }, [selectedSighting]);
+
   const onCloseSightingDetail = useCallback(() => {
     setSelectedSighting(null);
     setActiveComponent(ActiveComponent.SightingList);

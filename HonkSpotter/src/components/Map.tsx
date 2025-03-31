@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { MapContainer, Marker, Popup, TileLayer, useMap } from 'react-leaflet';
 import { useGooseSightingStore } from '@/store/useGooseSightingStore';
-import { LatLngExpression } from 'leaflet';
+import { LatLngExpression, Icon } from 'leaflet';
 import { GooseSighting } from '@/interfaces/gooseSighting';
 
 interface MapProps {
@@ -12,6 +12,16 @@ interface MapProps {
 const DEFAULT_CENTER: LatLngExpression = [43.4643, -80.5204]; // Default to Waterloo
 const DEFAULT_ZOOM = 11;
 const DEFAULT_SELECTED_ZOOM = 15;
+
+const defaultIcon = new Icon({
+  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+  popupAnchor: [0, -41],
+});
+
+const selectedIcon = new Icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+  popupAnchor: [0, -41],
+});
 
 const ChangeView = ({ center, zoom }: { center: LatLngExpression; zoom: number }) => {
   const map = useMap();
@@ -60,6 +70,7 @@ const Map = ({ selectedSighting, setSelectedSighting }: MapProps) => {
         <Marker
           key={sighting.id}
           position={[sighting.coords.lat, sighting.coords.lng]}
+          icon={sighting.id === selectedSighting?.id ? selectedIcon : defaultIcon}
           eventHandlers={{
             click: () => {
               setSelectedSighting(sighting);
