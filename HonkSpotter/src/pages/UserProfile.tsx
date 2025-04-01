@@ -8,7 +8,7 @@ import { User } from '@/interfaces/user';
 import { useSnackbar } from 'notistack';
 import { isAxiosError } from 'axios';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import ProfileCard from '@/components/ProfileCard';
 
 const UserProfile = () => {
   const { userId } = useParams({ strict: false });
@@ -66,31 +66,7 @@ const UserProfile = () => {
     );
   }
 
-  return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="bg-white shadow-md rounded-lg p-6 max-w-2xl mx-auto">
-        <div className="flex flex-col md:flex-row items-center">
-          <Avatar>
-            <AvatarImage src={user.profile_picture} />
-            <AvatarFallback>CN</AvatarFallback>
-          </Avatar>
-
-          <div className="text-center md:text-left">
-            <h1 className="text-2xl font-bold">{user.username || 'Anonymous User'}</h1>
-            {user.is_banned && (
-              <span className="bg-red-100 text-red-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded">Banned</span>
-            )}
-          </div>
-        </div>
-
-        <div className="mt-6">
-          <h2 className="text-xl font-semibold mb-2">About</h2>
-          <p className="text-gray-700">{user.description || 'This user has not added a description yet.'}</p>
-        </div>
-      </div>
-    </div>
-  );
+  return <ProfileCard user={user} />;
 };
 
 export default UserProfile;
-

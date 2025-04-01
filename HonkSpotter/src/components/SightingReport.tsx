@@ -1,7 +1,7 @@
 import { useGooseSightingStore } from '@/store/useGooseSightingStore';
-import { useState } from "react";
-import { Button } from '@/components/ui/button'
-import { Input, Textarea } from '@/components/ui/input'
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input, Textarea } from '@/components/ui/input';
 import { GooseSighting } from '@/interfaces/gooseSighting';
 import apiClient from '@/api/apiClient';
 import { ApiEndpoints } from '@/enums/apiEndpoints';
@@ -13,57 +13,23 @@ interface ReportSightingProps {
   onClose: () => void;
 }
 
-const ReportSighting = ({ onClose } : ReportSightingProps) => {
+const ReportSighting = ({ onClose }: ReportSightingProps) => {
   const { addGooseSighting } = useGooseSightingStore();
 
   const [formData, setFormData] = useState({
-    name: "",
-    notes: "",
-    lat: "",
-    lng: "",
-    image: "",
+    name: '',
+    notes: '',
+    lat: '',
+    lng: '',
+    image: '',
   });
 
-  const handleChange = (e: { target: { name: string; value: string; }; }) => {
+  const handleChange = (e: { target: { name: string; value: string } }) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  const onImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const fileUploadData = new FormData();
-    fileUploadData.append("image", file);
-
-    try {
-      const response = await apiClient.post(ApiEndpoints.ImageUpload, fileUploadData, {
-        headers: { "Content-Type": "multipart/form-data" },
-        withCredentials: true,
-      });
-
-      // Delete existing image if exists
-      if (formData.image) {
-        await apiClient.delete(`/image-delete/${formData.image}`, { withCredentials: true });
-      }
-
-      setFormData((prev) => ({ ...prev, image: response.data.id }));
-    } catch (error) {
-      console.error("Image upload failed", error);
-    }
-  };
-
-  const onDeleteImage = async( e: { preventDefault: () => void; }) => {
-    e.preventDefault();
-
-    const response = await apiClient.delete(`/image-delete/${formData.image}`, { withCredentials: true });
-
-    if (response.status == 200) {
-      setFormData((prev) => ({ ...prev, image: ''}));
-    }
-  }
-
-  const handleSubmit = async (e: { preventDefault: () => void; }) => {
+  const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
     // Handle form submission (e.g., send data to an API)
     const postData = {
@@ -74,7 +40,7 @@ const ReportSighting = ({ onClose } : ReportSightingProps) => {
     };
 
     try {
-      const response = await apiClient.post(ApiEndpoints.SubmitSighting, postData, {withCredentials: true})
+      const response = await apiClient.post(ApiEndpoints.SubmitSighting, postData, { withCredentials: true });
       const sighting = await response.data.sighting;
       const gooseSighting: GooseSighting = {
         id: sighting.id,
@@ -87,7 +53,7 @@ const ReportSighting = ({ onClose } : ReportSightingProps) => {
         image: sighting.image,
         user: sighting.user.email,
         created_date: new Date(sighting.created_date),
-      }
+      };
       addGooseSighting(gooseSighting);
     } catch (e: unknown) {
       const error = e as AxiosError;
@@ -103,26 +69,42 @@ const ReportSighting = ({ onClose } : ReportSightingProps) => {
       <Input name="name" placeholder="Name" value={formData.name} onChange={handleChange} required />
 
       <Label htmlFor="notes">Notes</Label>
-      <Textarea name="notes" placeholder="Write any notes here..." value={formData.notes} onChange={handleChange} required />
+      <Textarea
+        name="notes"
+        placeholder="Write any notes here..."
+        value={formData.notes}
+        onChange={handleChange}
+        required
+      />
 
       <div className="flex flex-row">
         <div className="mr-4">
           <Label htmlFor="lat">Latitude</Label>
-          <Input name="lat" placeholder="Latitude" value={formData.lat} onChange={handleChange} className="w-fit" required />
+          <Input
+            name="lat"
+            placeholder="Latitude"
+            value={formData.lat}
+            onChange={handleChange}
+            className="w-fit"
+            required
+          />
         </div>
         <div>
           <Label htmlFor="lng">Longitude</Label>
-          <Input name="lng" placeholder="Longitude" value={formData.lng} onChange={handleChange} className="w-fit" required />
+          <Input
+            name="lng"
+            placeholder="Longitude"
+            value={formData.lng}
+            onChange={handleChange}
+            className="w-fit"
+            required
+          />
         </div>
       </div>
 
-
       <Label htmlFor="image">Image</Label>
-      <ImageUpload onImageChange={onImageChange} onDeleteImage={onDeleteImage} />
-      <Button 
-        type="submit"
-        className="w-fit bg-green-400 hover:bg-green-500 mt-auto"
-      >
+      <ImageUpload onImageChange={(image) => setFormData((prev) => ({ ...prev, image }))} />
+      <Button type="submit" className="w-fit bg-green-400 hover:bg-green-500 mt-auto">
         Submit Goose Sighting
       </Button>
     </form>
