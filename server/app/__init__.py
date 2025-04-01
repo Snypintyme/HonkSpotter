@@ -82,7 +82,7 @@ def create_app():
     origin = (
         "https://honkspotter.rocks"
         if app.config["IS_PROD"]
-        else "http://localhost:5174"
+        else ["http://localhost:5174", "http://localhost:5173"]
     )
     CORS(
         app,
