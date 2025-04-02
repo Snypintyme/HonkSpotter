@@ -24,7 +24,7 @@ const SightingDetail = () => {
   };
 
   const onClickUserProfile = () => {
-    navigate({ to: `/profile/${selectedSighting.user.id}` });
+    navigate({ to: `/user/${selectedSighting.user.id}` });
   };
 
   return (
@@ -34,12 +34,8 @@ const SightingDetail = () => {
       </Button>
       <h1 className="text-4xl font-bold mb-6 text-gray-800">{selectedSighting.name}</h1>
       {selectedSighting.user && (
-        <div className="flex items-center mb-6">
-          <ProfilePicture
-            profilePictureId={selectedSighting.user.profile_picture}
-            onClickAvatar={onClickUserProfile}
-            className="w-10 h-10"
-          />
+        <div className="inline-flex items-center mb-6 w-fit cursor-pointer pr-2" onClick={onClickUserProfile}>
+          <ProfilePicture profilePictureId={selectedSighting.user.profile_picture} className="w-10 h-10" />
           <div className="ml-4">{selectedSighting.user.username || 'Anonymous User'}</div>
         </div>
       )}
