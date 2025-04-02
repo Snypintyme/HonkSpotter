@@ -10,17 +10,10 @@ import SelectMapLocationButton from '@/components/buttons/SelectMapLocationButto
 import router from '@/router';
 import { Outlet, useLocation } from '@tanstack/react-router';
 
-// enum ActiveComponent {
-//   SightingList,
-//   SightingDetail,
-//   ReportSighting
-// }
-
 const Homepage = () => {
-  const { selectedSighting, setGooseSightings } = useGooseSightingStore();
+  const { setGooseSightings } = useGooseSightingStore();
   const location = useLocation();
-  console.log(location);
-  console.log(selectedSighting);
+
 
   const { data: gooseSightings } = useQuery<GooseSighting[]>({
     queryKey: ['sightings'],

@@ -10,10 +10,6 @@ import { Label } from './ui/label';
 import ImageUpload from './ImageUpload';
 import router from '@/router';
 
-// interface ReportSightingProps {
-//   onClose: () => void;
-// }
-
 const ReportSighting = () => {
   const { addGooseSighting } = useGooseSightingStore();
 

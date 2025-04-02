@@ -4,11 +4,6 @@ import { useGooseSightingStore } from '@/store/useGooseSightingStore';
 import { LatLngExpression, Icon } from 'leaflet';
 import router from '@/router';
 
-// interface MapProps {
-//   selectedSighting: GooseSighting | null;
-//   setSelectedSighting: (sighting: GooseSighting) => void;
-// }
-
 const DEFAULT_CENTER: LatLngExpression = [43.4643, -80.5204]; // Default to Waterloo
 const DEFAULT_ZOOM = 11;
 const DEFAULT_SELECTED_ZOOM = 15;

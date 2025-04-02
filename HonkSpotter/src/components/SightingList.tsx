@@ -2,16 +2,11 @@ import { GooseSighting } from '@/interfaces/gooseSighting';
 import router from '@/router';
 import { useGooseSightingStore } from '@/store/useGooseSightingStore';
 
-// interface SightingListProps {
-//   onClickSelectedSighting: (sighting: GooseSighting) => void;
-// }
-
 const SightingList = () => {
   const { gooseSightings, selectedSighting, setSelectedSighting } = useGooseSightingStore();
   console.log(selectedSighting);
   const onClickSelectedSighting = (sighting: GooseSighting) => {
     setSelectedSighting(sighting);
-    console.log('nav')
     router.navigate({ to: `/detail/${sighting.id}`});
   };
 
