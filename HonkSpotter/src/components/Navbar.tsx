@@ -15,7 +15,7 @@ const Navbar = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
-  const { image } = useImage(getProfilePictureId() ?? undefined);
+  const { image } = useImage(getProfilePictureId());
 
   // Call a temporary GET /api/test endpoint
   const handleTestApi = async () => {

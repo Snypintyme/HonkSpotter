@@ -1,4 +1,5 @@
 """Main application routes"""
+
 import logging
 from flask import Blueprint, request, jsonify, make_response
 from flask_jwt_extended import jwt_required, get_jwt_identity
@@ -6,6 +7,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.models.sightings import Sighting
 from app.models.user import User
 from app import db
+import uuid
 
 main_bp = Blueprint("main", __name__)
 security_logger = logging.getLogger("security")
@@ -95,19 +97,27 @@ def submit_sighting():
 def sightings():
     """
     GET /api/sightings
-    Gets all active goose sightings in the database
+    Gets all active goose sightings in the database, optionally filtered by user ID
     """
     try:
         security_logger.info(f"Get goose sightings - IP: {request.remote_addr}")
 
-        # Query sightings with joined user data to avoid N+1 query problem
-        goose_sightings = Sighting.query.join(User).all()
+        user_id = request.args.get("user_id")
+
+        if user_id:
+            try:
+                uuid.UUID(user_id, version=4)
+            except ValueError:
+                return jsonify({"error": "Invalid user_id format"}), 400
+
+            goose_sightings = (
+                Sighting.query.join(User).filter(Sighting.user_id == user_id).all()
+            )
+        else:
+            goose_sightings = Sighting.query.join(User).all()
 
         # Convert the sightings to a list of dictionaries
-        sightings_list = []
-        for sighting in goose_sightings:
-            sighting_dict = sighting.to_dict()
-            sightings_list.append(sighting_dict)
+        sightings_list = [sighting.to_dict() for sighting in goose_sightings]
 
         debug_logger.debug(
             f"Get goose sightings, number of sightings: {len(goose_sightings)}"

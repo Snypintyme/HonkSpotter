@@ -1,27 +1,17 @@
 import { Button } from './ui/button';
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useGooseSightingStore } from '@/store/useGooseSightingStore';
 import router, { detailRoute } from '@/router';
 import { useImage } from '@/hooks/useImage';
 
-
 const SightingDetail = () => {
   const { gooseSightings, selectedSighting, setSelectedSighting } = useGooseSightingStore();
-  const { sightingId } = detailRoute.useParams()
-  const [initialLoad, setInitialLoad] = useState(true);
-  const { image, error } = useImage(selectedSighting?.image);
+  const { sightingId } = detailRoute.useParams();
+  const { image, error } = useImage(selectedSighting?.image ?? null);
 
-  // Find sighting, set the state, and fetch the image
   useEffect(() => {
-    if (!selectedSighting && initialLoad) {
-      const sighting = gooseSightings.find((sighting) => sighting.id = sightingId);
-      if (sighting) {
-        setInitialLoad(false);
-        setSelectedSighting(sighting);
-      }
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [gooseSightings]);
+    setSelectedSighting(gooseSightings.find((sighting) => sighting.id === sightingId) ?? null);
+  }, [gooseSightings, setSelectedSighting, sightingId]);
 
   if (!selectedSighting) return <p>Cannot find sighting</p>;
 
@@ -32,15 +22,14 @@ const SightingDetail = () => {
   }
 
   const onClickBack = () => {
-    console.log('backing');
     setSelectedSighting(null);
-    router.navigate({ to: '/',})
-  }
+    router.navigate({ to: '/sightings' });
+  };
 
   return (
     <div className="p-4">
       <Button variant="link" onClick={onClickBack} className="text-blue-500 px-0">
-        &larr; Back
+        &larr; Home
       </Button>
       <h3 className="text-xl font-bold mb-2">{selectedSighting.name}</h3>
       <p className="mb-2">{selectedSighting.notes}</p>
