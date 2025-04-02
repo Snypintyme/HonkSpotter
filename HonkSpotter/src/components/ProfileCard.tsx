@@ -46,7 +46,11 @@ const ProfileCard = ({ user, sightings }: ProfileCardProps) => {
       <div className="bg-white shadow-lg rounded-lg p-8 max-w-3xl mx-auto">
         {/* Profile Header */}
         <div className="flex flex-col md:flex-row items-center gap-6">
-          <ProfilePicture profilePictureId={user.profile_picture} className="w-24 h-24" />
+          <ProfilePicture
+            profilePictureId={user.profile_picture}
+            fallback={user.username?.charAt(0)?.toUpperCase() ?? null}
+            className="w-24 h-24"
+          />
           <div className="flex flex-col text-center md:text-left">
             <h1 className="text-3xl font-bold text-gray-800">{user.username || 'Anonymous User'}</h1>
             {user.is_banned && (

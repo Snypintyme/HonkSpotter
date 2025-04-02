@@ -35,7 +35,11 @@ const SightingDetail = () => {
       <h1 className="text-4xl font-bold mb-6 text-gray-800">{selectedSighting.name}</h1>
       {selectedSighting.user && (
         <div className="inline-flex items-center mb-6 w-fit cursor-pointer pr-2" onClick={onClickUserProfile}>
-          <ProfilePicture profilePictureId={selectedSighting.user.profile_picture} className="w-10 h-10" />
+          <ProfilePicture
+            profilePictureId={selectedSighting.user.profile_picture}
+            fallback={selectedSighting.user.username?.charAt(0)?.toUpperCase() ?? null}
+            className="w-10 h-10"
+          />
           <div className="ml-4">{selectedSighting.user.username || 'Anonymous User'}</div>
         </div>
       )}

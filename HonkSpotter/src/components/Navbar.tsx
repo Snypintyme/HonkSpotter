@@ -9,7 +9,7 @@ import { ApiEndpoints } from '@/enums/apiEndpoints';
 import ProfilePicture from './ProfilePicture';
 
 const Navbar = () => {
-  const { accessToken, clearAccessToken, getUserId, getProfilePictureId } = useAuthStore();
+  const { accessToken, clearAccessToken, getUserId, getUsernameFallback, getProfilePictureId } = useAuthStore();
   const { enqueueSnackbar } = useSnackbar();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -94,6 +94,7 @@ const Navbar = () => {
               <div className="relative" ref={dropdownRef}>
                 <ProfilePicture
                   profilePictureId={getProfilePictureId()}
+                  fallback={getUsernameFallback() ?? null}
                   onClickAvatar={() => setDropdownOpen((prev) => !prev)}
                 />
 

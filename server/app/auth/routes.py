@@ -47,28 +47,39 @@ def login():
         # Validate user credentials against the DB
         user = User.query.filter_by(email=email).first()
 
-        if user and user.account_locked_until and user.account_locked_until > datetime.now(timezone.utc):
+        if (
+            user
+            and user.account_locked_until
+            and user.account_locked_until > datetime.now(timezone.utc)
+        ):
             security_logger.warning(
                 f"Locked account login attempt - IP: {request.remote_addr}"
             )
-            return jsonify({
-                "msg": f"Account locked until {user.account_locked_until.strftime('%Y-%m-%d %H:%M:%S UTC')}"
-            }), 403
-        
+            return (
+                jsonify(
+                    {
+                        "msg": f"Account locked until {user.account_locked_until.strftime('%Y-%m-%d %H:%M:%S UTC')}"
+                    }
+                ),
+                403,
+            )
+
         if not user or not user.check_password(password):
             if user:
                 if not user.failed_login_attempts:
                     user.failed_login_attempts = 1
                 else:
-                  user.failed_login_attempts += 1
+                    user.failed_login_attempts += 1
                 print(user.failed_login_attempts)
-                
+
                 if user.failed_login_attempts >= 4:
-                    user.account_locked_until = datetime.now(timezone.utc) + timedelta(minutes=1)
+                    user.account_locked_until = datetime.now(timezone.utc) + timedelta(
+                        minutes=1
+                    )
                     security_logger.warning(
                         f"Account locked for {email} - IP: {request.remote_addr}"
                     )
-                    
+
                 db.session.commit()
 
             security_logger.warning(f"Failed login attempt - IP: {request.remote_addr}")
@@ -85,6 +96,7 @@ def login():
         additional_claims = {
             "user_id": str(user.id),
             "profile_picture": user.profile_picture,
+            "username": user.username,
         }
         access_token = create_access_token(
             identity=email, additional_claims=additional_claims
@@ -100,21 +112,23 @@ def login():
         print(e)
         return jsonify({"error": "Internal server error"}), 500
 
+
 def check_password_complexity(password):
     if len(password) < 8:
         return False
-    
+
     categories = 0
-    if re.search(r'[A-Z]', password): 
+    if re.search(r"[A-Z]", password):
         categories += 1
-    if re.search(r'[a-z]', password): 
+    if re.search(r"[a-z]", password):
         categories += 1
-    if re.search(r'[0-9]', password): 
+    if re.search(r"[0-9]", password):
         categories += 1
-    if re.search(r'[^A-Za-z0-9]', password): 
+    if re.search(r"[^A-Za-z0-9]", password):
         categories += 1
-    
+
     return categories >= 4
+
 
 @auth_bp.route("/signup", methods=["POST"])
 def signup():
@@ -140,9 +154,14 @@ def signup():
             security_logger.warning(
                 f"Weak password attempt for {email} - IP: {request.remote_addr}"
             )
-            return jsonify({
-                "error": "Password must be at least 8 characters and include at least one of each: uppercase, lowercase, number, special character"
-            }), 400
+            return (
+                jsonify(
+                    {
+                        "error": "Password must be at least 8 characters and include at least one of each: uppercase, lowercase, number, special character"
+                    }
+                ),
+                400,
+            )
 
         if User.query.filter_by(email=email).first():
             return jsonify({"msg": "User already exists"}), 409
@@ -159,6 +178,7 @@ def signup():
         additional_claims = {
             "user_id": str(new_user.id),
             "profile_picture": new_user.profile_picture,
+            "username": new_user.username,
         }
         access_token = create_access_token(
             identity=email, additional_claims=additional_claims
@@ -194,6 +214,7 @@ def refresh():
         additional_claims = {
             "user_id": str(user.id),
             "profile_picture": user.profile_picture,
+            "username": user.username,
         }
         new_access_token = create_access_token(
             identity=current_user, additional_claims=additional_claims
