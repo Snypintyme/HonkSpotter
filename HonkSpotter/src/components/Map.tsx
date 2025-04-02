@@ -2,12 +2,7 @@ import { useMemo, useState } from 'react';
 import { MapContainer, Marker, Popup, TileLayer, useMap } from 'react-leaflet';
 import { useGooseSightingStore } from '@/store/useGooseSightingStore';
 import { LatLngExpression, Icon } from 'leaflet';
-import { GooseSighting } from '@/interfaces/gooseSighting';
-
-interface MapProps {
-  selectedSighting: GooseSighting | null;
-  setSelectedSighting: (sighting: GooseSighting) => void;
-}
+import router from '@/router';
 
 const DEFAULT_CENTER: LatLngExpression = [43.4643, -80.5204]; // Default to Waterloo
 const DEFAULT_ZOOM = 11;
@@ -29,8 +24,8 @@ const ChangeView = ({ center, zoom }: { center: LatLngExpression; zoom: number }
   return null;
 };
 
-const Map = ({ selectedSighting, setSelectedSighting }: MapProps) => {
-  const { gooseSightings } = useGooseSightingStore();
+const Map = () => {
+  const { gooseSightings, selectedSighting, setSelectedSighting } = useGooseSightingStore();
   const [initialMapLoaded, setInitialMapLoaded] = useState<boolean>(false);
 
   // When goose sightings are loaded, update the default map center and zoom
@@ -50,6 +45,7 @@ const Map = ({ selectedSighting, setSelectedSighting }: MapProps) => {
   // When a valid sighting is selected, snap to selected sighting
   const [selectedSightingCenter, selectedSightingZoom] = useMemo(() => {
     if (selectedSighting) {
+      router.navigate({ to: `/detail/${selectedSighting.id}`})
       const newCenter: LatLngExpression = [selectedSighting.coords.lat, selectedSighting.coords.lng];
       return [newCenter, DEFAULT_SELECTED_ZOOM];
     }

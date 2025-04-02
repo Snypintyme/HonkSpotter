@@ -35,7 +35,7 @@ const Textarea: React.FC<TextareaProps> = ({ name, placeholder, value, onChange,
       value={value}
       onChange={onChange}
       required={required}
-      className={`w-full p-2 border rounded ${className}`}
+      className={`w-full p-2 border rounded text-sm ${className}`}
     />
   );
 };

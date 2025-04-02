@@ -3,6 +3,9 @@ import App from './App';
 import Homepage from './pages/Homepage';
 import Authentication from './pages/Authentication';
 import { AuthType } from './enums/authType';
+import SightingReport from './components/SightingReport';
+import SightingDetail from './components/SightingDetail';
+import SightingList from './components/SightingList';
 import UserProfile from './pages/UserProfile';
 import AuthGuard from './components/AuthGuard';
 
@@ -14,6 +17,24 @@ const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/',
   component: Homepage,
+});
+
+const listRoute = createRoute({
+  getParentRoute: () => indexRoute,
+  path: '/sightings',
+  component: SightingList,
+});
+
+export const detailRoute = createRoute({
+  getParentRoute: () => indexRoute,
+  path: '/detail/$sightingId', // Correct syntax for dynamic params
+  component: SightingDetail,
+});
+
+const reportRoute = createRoute({
+  getParentRoute: () => indexRoute,
+  path: '/report',
+  component: SightingReport,
 });
 
 const loginRoute = createRoute({
@@ -28,6 +49,7 @@ const signupRoute = createRoute({
   component: () => <Authentication authType={AuthType.Signup} />,
 });
 
+
 const userProfileRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/user/$userId',
@@ -38,7 +60,15 @@ const userProfileRoute = createRoute({
   ),
 });
 
-const routeTree = rootRoute.addChildren([indexRoute, loginRoute, signupRoute, userProfileRoute]);
+const routeTree = rootRoute.addChildren([
+  indexRoute,
+  listRoute,
+  detailRoute,
+  reportRoute,
+  loginRoute,
+  signupRoute,
+  userProfileRoute
+]);
 
 const router = createRouter({
   routeTree,
