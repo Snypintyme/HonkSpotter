@@ -17,6 +17,8 @@ class User(db.Model):
     profile_picture = db.Column(db.String(256), nullable=True)
     is_banned = db.Column(db.Boolean, default=False)
     posts = relationship("Sighting", back_populates="user")
+    failed_login_attempts = db.Column(db.Integer, default=0)
+    account_locked_until = db.Column(db.DateTime(timezone=True), nullable=True)
 
     def set_password(self, password_plaintext):
         """Set hashed password"""

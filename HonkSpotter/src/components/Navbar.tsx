@@ -39,6 +39,7 @@ const Navbar = () => {
         clearAccessToken();
         setDropdownOpen(false);
         enqueueSnackbar('Logged out', { variant: 'success' });
+        navigate({ to: '/login' });
       }
     } catch (error: unknown) {
       if (error instanceof Error) {

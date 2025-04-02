@@ -1,5 +1,6 @@
 import re
 import logging
+from datetime import datetime, timedelta, timezone
 from flask import Blueprint, request, jsonify, make_response
 from flask_jwt_extended import (
     create_access_token,
@@ -45,12 +46,41 @@ def login():
 
         # Validate user credentials against the DB
         user = User.query.filter_by(email=email).first()
+
+        if user and user.account_locked_until and user.account_locked_until > datetime.now(timezone.utc):
+            security_logger.warning(
+                f"Locked account login attempt - IP: {request.remote_addr}"
+            )
+            return jsonify({
+                "msg": f"Account locked until {user.account_locked_until.strftime('%Y-%m-%d %H:%M:%S UTC')}"
+            }), 403
+        
         if not user or not user.check_password(password):
+            if user:
+                if not user.failed_login_attempts:
+                    user.failed_login_attempts = 1
+                else:
+                  user.failed_login_attempts += 1
+                print(user.failed_login_attempts)
+                
+                if user.failed_login_attempts >= 4:
+                    user.account_locked_until = datetime.now(timezone.utc) + timedelta(minutes=1)
+                    security_logger.warning(
+                        f"Account locked for {email} - IP: {request.remote_addr}"
+                    )
+                    
+                db.session.commit()
+
             security_logger.warning(f"Failed login attempt - IP: {request.remote_addr}")
             return jsonify({"msg": "Invalid email or password"}), 401
 
         security_logger.info(f"Successful login - IP: {request.remote_addr}")
         debug_logger.debug(f"User {email} logged in successfully")
+
+        if user.failed_login_attempts > 0 or user.account_locked_until:
+            user.failed_login_attempts = 0
+            user.account_locked_until = None
+            db.session.commit()
 
         additional_claims = {
             "user_id": str(user.id),
@@ -67,6 +97,7 @@ def login():
 
     except Exception as e:
         security_logger.error(f"Login error: {str(e)}", exc_info=True)
+        print(e)
         return jsonify({"error": "Internal server error"}), 500
 
 def check_password_complexity(password):
