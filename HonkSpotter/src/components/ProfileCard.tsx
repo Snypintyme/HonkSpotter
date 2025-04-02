@@ -1,7 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import EditProfileDialog from '@/components/EditProfileDialog';
-import { useImage } from '@/hooks/useImage';
 import { User } from '@/interfaces/user';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useState } from 'react';
@@ -12,6 +10,7 @@ import { useSnackbar } from 'notistack';
 import { isAxiosError } from 'axios';
 import { GooseSighting } from '@/interfaces/gooseSighting';
 import { navigateToSightingDetail } from '@/lib/utils';
+import ProfilePicture from './ProfilePicture';
 
 interface ProfileCardProps {
   user: User;
@@ -20,7 +19,6 @@ interface ProfileCardProps {
 
 const ProfileCard = ({ user, sightings }: ProfileCardProps) => {
   const { getUserId } = useAuthStore();
-  const { image } = useImage(user.profile_picture);
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const queryClient = useQueryClient();
   const { enqueueSnackbar } = useSnackbar();
@@ -48,11 +46,7 @@ const ProfileCard = ({ user, sightings }: ProfileCardProps) => {
       <div className="bg-white shadow-lg rounded-lg p-8 max-w-3xl mx-auto">
         {/* Profile Header */}
         <div className="flex flex-col md:flex-row items-center gap-6">
-          <Avatar className="w-24 h-24">
-            <AvatarImage src={image} />
-            <AvatarFallback>{user.username?.charAt(0).toUpperCase() || 'U'}</AvatarFallback>
-          </Avatar>
-
+          <ProfilePicture profilePictureId={user.profile_picture} className="w-24 h-24" />
           <div className="flex flex-col text-center md:text-left">
             <h1 className="text-3xl font-bold text-gray-800">{user.username || 'Anonymous User'}</h1>
             {user.is_banned && (

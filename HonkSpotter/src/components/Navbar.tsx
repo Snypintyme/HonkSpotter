@@ -6,8 +6,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { useEffect, useRef, useState } from 'react';
 import apiClient from '@/api/apiClient';
 import { ApiEndpoints } from '@/enums/apiEndpoints';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { useImage } from '@/hooks/useImage';
+import ProfilePicture from './ProfilePicture';
 
 const Navbar = () => {
   const { accessToken, clearAccessToken, getUserId, getProfilePictureId } = useAuthStore();
@@ -15,7 +14,6 @@ const Navbar = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
-  const { image } = useImage(getProfilePictureId());
 
   // Call a temporary GET /api/test endpoint
   const handleTestApi = async () => {
@@ -94,10 +92,11 @@ const Navbar = () => {
             </Button>
             {accessToken ? (
               <div className="relative" ref={dropdownRef}>
-                <Avatar onClick={() => setDropdownOpen((prev) => !prev)}>
-                  <AvatarImage src={image} />
-                  <AvatarFallback>CN</AvatarFallback>
-                </Avatar>
+                <ProfilePicture
+                  profilePictureId={getProfilePictureId()}
+                  onClickAvatar={() => setDropdownOpen((prev) => !prev)}
+                />
+
                 {dropdownOpen && (
                   <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 shadow-lg z-1000">
                     <button
