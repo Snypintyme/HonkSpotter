@@ -55,7 +55,18 @@ export function AuthForm({ authType, className, ...props }: AuthFormProps) {
       console.log(`${authType === AuthType.Login ? 'Login' : 'Signup'} successful`, data);
     },
     onError: (error) => {
-      enqueueSnackbar(`Error: ${error.message}`, { variant: 'error' });
+      const message = error.message;
+      const responseData = (error as any).response?.data;
+      
+      if (responseData?.msg?.includes('Account locked until')) {
+        enqueueSnackbar(responseData.msg, { 
+          variant: 'warning',
+          autoHideDuration: 10000
+        });
+      } 
+      else {
+        enqueueSnackbar(`Error: ${message}`, { variant: 'error' });
+      }
     },
   });
 
