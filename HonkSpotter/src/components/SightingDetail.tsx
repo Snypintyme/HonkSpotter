@@ -1,20 +1,20 @@
-import { GooseSighting } from '@/interfaces/gooseSighting';
 import { Button } from './ui/button';
 import { useState, useEffect } from 'react';
 import apiClient from '@/api/apiClient';
+import { useGooseSightingStore } from '@/store/useGooseSightingStore';
+import router, { detailRoute } from '@/router';
 
-interface SightingDetailProps {
-  sighting: GooseSighting;
-  onClose: () => void;
-}
 
-const SightingDetail = ({ sighting, onClose }: SightingDetailProps) => {
+const SightingDetail = () => {
+  const { gooseSightings, selectedSighting, setSelectedSighting } = useGooseSightingStore();
   const [imageData, setImageData] = useState('');
   const [error, setError] = useState(null);
+  const { sightingId } = detailRoute.useParams()
 
+  // Find sighting, set the state, and fetch the image
   useEffect(() => {
     const fetchImage = async () => {
-      if (!sighting.image) {
+      if (!selectedSighting?.image) {
         return;
       }
 
@@ -22,7 +22,7 @@ const SightingDetail = ({ sighting, onClose }: SightingDetailProps) => {
 
       try {
         // Fetch the image directly - the response will be the image binary data
-        const response = await apiClient.get(`/image/${sighting.image}`, {
+        const response = await apiClient.get(`/image/${selectedSighting.image}`, {
           responseType: 'blob', // Important: This tells axios to expect binary data
           withCredentials: true
         });
@@ -35,8 +35,13 @@ const SightingDetail = ({ sighting, onClose }: SightingDetailProps) => {
       }
     };
 
+    if (!selectedSighting) {
+      const sighting = gooseSightings.find((sighting) => sighting.id = sightingId);
+      if (sighting) setSelectedSighting(sighting);
+    }
+
     fetchImage();
-  }, [sighting]);
+  }, [gooseSightings, selectedSighting, setSelectedSighting, sightingId]);
 
   useEffect(() => {
     return () => {
@@ -46,21 +51,29 @@ const SightingDetail = ({ sighting, onClose }: SightingDetailProps) => {
     };
   }, [imageData]);
 
+
+  if (!selectedSighting) return <p>Cannot find sighting</p>;
+
   let notif = undefined;
 
   if (error) {
     notif = <div className="error-message">Error displaying image</div>;
   }
 
+  const onClickBack = () => {
+    setSelectedSighting(null);
+    router.navigate({ to: '/',})
+  }
+
   return (
     <div className="p-4">
-      <Button variant="link" onClick={onClose} className="text-blue-500 px-0">
+      <Button variant="link" onClick={onClickBack} className="text-blue-500 px-0">
         &larr; Back
       </Button>
-      <h3 className="text-xl font-bold mb-2">{sighting.name}</h3>
-      <p className="mb-2">{sighting.notes}</p>
+      <h3 className="text-xl font-bold mb-2">{selectedSighting.name}</h3>
+      <p className="mb-2">{selectedSighting.notes}</p>
       <p className="text-sm text-gray-600">
-        Coordinates: {sighting.coords.lat}, {sighting.coords.lng}
+        Coordinates: {selectedSighting.coords.lat}, {selectedSighting.coords.lng}
       </p>
       {imageData ? (
         <div className="mt-2">

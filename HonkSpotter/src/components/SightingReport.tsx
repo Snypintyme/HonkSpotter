@@ -8,12 +8,13 @@ import { ApiEndpoints } from '@/enums/apiEndpoints';
 import { AxiosError } from 'axios';
 import { Label } from './ui/label';
 import ImageUpload from './ImageUpload';
+import router from '@/router';
 
-interface ReportSightingProps {
-  onClose: () => void;
-}
+// interface ReportSightingProps {
+//   onClose: () => void;
+// }
 
-const ReportSighting = ({ onClose } : ReportSightingProps) => {
+const ReportSighting = () => {
   const { addGooseSighting } = useGooseSightingStore();
 
   const [formData, setFormData] = useState({
@@ -93,39 +94,45 @@ const ReportSighting = ({ onClose } : ReportSightingProps) => {
       const error = e as AxiosError;
       console.log(error.message, '\n', error.stack);
     }
-    onClose();
+
+    router.navigate({ to: '/'})
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 flex flex-col h-full">
-      <h2 className="text-2xl font-bold mb-4">Report Goose Sighting</h2>
-      <Label htmlFor="name">Location Name</Label>
-      <Input name="name" placeholder="Name" value={formData.name} onChange={handleChange} required />
-
-      <Label htmlFor="notes">Notes</Label>
-      <Textarea name="notes" placeholder="Write any notes here..." value={formData.notes} onChange={handleChange} required />
-
-      <div className="flex flex-row">
-        <div className="mr-4">
-          <Label htmlFor="lat">Latitude</Label>
-          <Input name="lat" placeholder="Latitude" value={formData.lat} onChange={handleChange} className="w-fit" required />
-        </div>
-        <div>
-          <Label htmlFor="lng">Longitude</Label>
-          <Input name="lng" placeholder="Longitude" value={formData.lng} onChange={handleChange} className="w-fit" required />
-        </div>
-      </div>
-
-
-      <Label htmlFor="image">Image</Label>
-      <ImageUpload onImageChange={onImageChange} onDeleteImage={onDeleteImage} />
-      <Button 
-        type="submit"
-        className="w-fit bg-green-400 hover:bg-green-500 mt-auto"
-      >
-        Submit Goose Sighting
+    <>
+      <Button variant="link" onClick={() => router.navigate({ to: '/'})} className="text-blue-500 px-0">
+        &larr; Back
       </Button>
-    </form>
+      <form onSubmit={handleSubmit} className="space-y-4 flex flex-col h-full">
+        <h2 className="text-2xl font-bold mb-4">Report Goose Sighting</h2>
+        <Label htmlFor="name">Location Name</Label>
+        <Input name="name" placeholder="Name" value={formData.name} onChange={handleChange} required />
+
+        <Label htmlFor="notes">Notes</Label>
+        <Textarea name="notes" placeholder="Write any notes here..." value={formData.notes} onChange={handleChange} required />
+
+        <div className="flex flex-row">
+          <div className="mr-4">
+            <Label htmlFor="lat">Latitude</Label>
+            <Input name="lat" placeholder="Latitude" value={formData.lat} onChange={handleChange} className="w-fit" required />
+          </div>
+          <div>
+            <Label htmlFor="lng">Longitude</Label>
+            <Input name="lng" placeholder="Longitude" value={formData.lng} onChange={handleChange} className="w-fit" required />
+          </div>
+        </div>
+
+
+        <Label htmlFor="image">Image</Label>
+        <ImageUpload onImageChange={onImageChange} onDeleteImage={onDeleteImage} />
+        <Button 
+          type="submit"
+          className="w-fit bg-green-400 hover:bg-green-500 mt-auto"
+        >
+          Submit Goose Sighting
+        </Button>
+      </form>
+    </>
   );
 };
 

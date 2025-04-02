@@ -1,26 +1,28 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect } from 'react';
 import Map from '@/components/Map';
 import { useGooseSightingStore } from '@/store/useGooseSightingStore';
-import SightingList from '@/components/SightingList';
 import { GooseSighting } from '@/interfaces/gooseSighting';
-import SightingDetail from '@/components/SightingDetail';
 import { useQuery } from '@tanstack/react-query';
 import apiClient from '@/api/apiClient';
 import { ApiEndpoints } from '@/enums/apiEndpoints';
-import ReportSighting from '@/components/SightingReport';
 import ReportSightingButton from '@/components/buttons/ReportSightingButton';
 import SelectMapLocationButton from '@/components/buttons/SelectMapLocationButton';
+import router from '@/router';
+import { Outlet, useLocation } from '@tanstack/react-router';
 
-enum ActiveComponent {
-  SightingList,
-  SightingDetail,
-  ReportSighting
-}
+// enum ActiveComponent {
+//   SightingList,
+//   SightingDetail,
+//   ReportSighting
+// }
 
 const Homepage = () => {
-  const { setGooseSightings: setGooseSightings } = useGooseSightingStore();
-  const [selectedSighting, setSelectedSighting] = useState<GooseSighting | null>(null);
-  const [activeComponent, setActiveComponent] = useState<ActiveComponent>(ActiveComponent.SightingList);
+  const { selectedSighting, setGooseSightings } = useGooseSightingStore();
+  // const [selectedSighting, setSelectedSighting] = useState<GooseSighting | null>(null);
+  // const [activeComponent, setActiveComponent] = useState<ActiveComponent>(ActiveComponent.SightingList);
+  const location = useLocation();
+  console.log(location);
+  console.log(selectedSighting);
 
   const { data: gooseSightings } = useQuery<GooseSighting[]>({
     queryKey: ['sightings'],
@@ -35,62 +37,70 @@ const Homepage = () => {
   }, [gooseSightings, setGooseSightings]);
 
   useEffect(() => {
-    if (selectedSighting) {
-      setActiveComponent(ActiveComponent.SightingDetail);
-    }
-  }, [selectedSighting]);
+    if (location.pathname === '/') router.navigate({ to: '/sightings' })
+  }, [location.pathname]);
 
-  const onCloseSightingDetail = useCallback(() => {
-    setSelectedSighting(null);
-    setActiveComponent(ActiveComponent.SightingList);
-  }, [setSelectedSighting, setActiveComponent]);
+  // useEffect(() => {
+  //   if (selectedSighting) {
+  //     // setActiveComponent(ActiveComponent.SightingDetail);
+  //     router.navigate({ to: `/detail/${selectedSighting.id}`})
+  //   }
+  // }, [selectedSighting]);
 
-  const onClickSelectedSighting = useCallback((sighting: GooseSighting) => {
-    setSelectedSighting(sighting);
-    setActiveComponent(ActiveComponent.SightingDetail);
-  }, [setSelectedSighting, setActiveComponent]);
+  // const onCloseSightingDetail = useCallback(() => {
+  //   setSelectedSighting(null);
+  //   setActiveComponent(ActiveComponent.SightingList);
+  // }, [setSelectedSighting, setActiveComponent]);
+
+  // const onClickSelectedSighting = useCallback((sighting: GooseSighting) => {
+  //   // setSelectedSighting(sighting);
+  //   // setActiveComponent(ActiveComponent.SightingDetail);
+
+  // }, []);
 
   const onClickReportSighting = useCallback(() => {
-    setActiveComponent(ActiveComponent.ReportSighting);
-  }, [setActiveComponent]);
+    // setActiveComponent(ActiveComponent.ReportSighting);
+    router.navigate({ to: '/report'})
+  }, []);
 
-  const renderComponent = () => {
-    switch(activeComponent) {
-      case ActiveComponent.SightingList:
-        return <SightingList onClickSelectedSighting={onClickSelectedSighting} />;
+  // const renderComponent = () => {
+  //   switch(activeComponent) {
+  //     case ActiveComponent.SightingList:
+  //       return <SightingList onClickSelectedSighting={onClickSelectedSighting} />;
 
-      case ActiveComponent.SightingDetail:
-        if (selectedSighting) {
-          return <SightingDetail sighting={selectedSighting} onClose={onCloseSightingDetail} />;
-        } else {
-          return <SightingList onClickSelectedSighting={onClickSelectedSighting} />;
-        }
+  //     case ActiveComponent.SightingDetail:
+  //       if (selectedSighting) {
+  //         return <SightingDetail sighting={selectedSighting} onClose={onCloseSightingDetail} />;
+  //       } else {
+  //         return <SightingList onClickSelectedSighting={onClickSelectedSighting} />;
+  //       }
 
-      case ActiveComponent.ReportSighting:
-        return <ReportSighting onClose={() => { 
-          setActiveComponent(ActiveComponent.SightingList);
-        }}/>;
+  //     case ActiveComponent.ReportSighting:
+  //       return <ReportSighting onClose={() => { 
+  //         setActiveComponent(ActiveComponent.SightingList);
+  //       }}/>;
 
-      default:
-        return undefined;
-    }
-  }
+  //     default:
+  //       return undefined;
+  //   }
+  // }
 
   return (
     <>
       <div className="flex-1 p-5 overflow-y-auto">
-        { renderComponent() }
+        <Outlet/>
       </div>
       <div className="flex-1 flex">
-        <Map selectedSighting={selectedSighting} setSelectedSighting={setSelectedSighting} />
+        <Map/>
       </div>
-      { activeComponent !== ActiveComponent.ReportSighting ? (
+      { location.href == '/report' ? (
         <ReportSightingButton
           onClick={onClickReportSighting}
         />
       ) : (
         <SelectMapLocationButton onClick={() => {}} />
       )}
+
     </>
   );
 };
