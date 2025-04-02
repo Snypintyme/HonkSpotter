@@ -18,8 +18,6 @@ import { Outlet, useLocation } from '@tanstack/react-router';
 
 const Homepage = () => {
   const { selectedSighting, setGooseSightings } = useGooseSightingStore();
-  // const [selectedSighting, setSelectedSighting] = useState<GooseSighting | null>(null);
-  // const [activeComponent, setActiveComponent] = useState<ActiveComponent>(ActiveComponent.SightingList);
   const location = useLocation();
   console.log(location);
   console.log(selectedSighting);
@@ -40,50 +38,22 @@ const Homepage = () => {
     if (location.pathname === '/') router.navigate({ to: '/sightings' })
   }, [location.pathname]);
 
-  // useEffect(() => {
-  //   if (selectedSighting) {
-  //     // setActiveComponent(ActiveComponent.SightingDetail);
-  //     router.navigate({ to: `/detail/${selectedSighting.id}`})
-  //   }
-  // }, [selectedSighting]);
-
-  // const onCloseSightingDetail = useCallback(() => {
-  //   setSelectedSighting(null);
-  //   setActiveComponent(ActiveComponent.SightingList);
-  // }, [setSelectedSighting, setActiveComponent]);
-
-  // const onClickSelectedSighting = useCallback((sighting: GooseSighting) => {
-  //   // setSelectedSighting(sighting);
-  //   // setActiveComponent(ActiveComponent.SightingDetail);
-
-  // }, []);
-
   const onClickReportSighting = useCallback(() => {
-    // setActiveComponent(ActiveComponent.ReportSighting);
     router.navigate({ to: '/report'})
   }, []);
 
-  // const renderComponent = () => {
-  //   switch(activeComponent) {
-  //     case ActiveComponent.SightingList:
-  //       return <SightingList onClickSelectedSighting={onClickSelectedSighting} />;
-
-  //     case ActiveComponent.SightingDetail:
-  //       if (selectedSighting) {
-  //         return <SightingDetail sighting={selectedSighting} onClose={onCloseSightingDetail} />;
-  //       } else {
-  //         return <SightingList onClickSelectedSighting={onClickSelectedSighting} />;
-  //       }
-
-  //     case ActiveComponent.ReportSighting:
-  //       return <ReportSighting onClose={() => { 
-  //         setActiveComponent(ActiveComponent.SightingList);
-  //       }}/>;
-
-  //     default:
-  //       return undefined;
-  //   }
-  // }
+  const showButton = () => {
+    const pathname = location.pathname;
+    if (pathname === '/sightings') {
+      return (
+        <ReportSightingButton
+          onClick={onClickReportSighting}
+        />
+      );
+    } else if (pathname === '/report') {
+      return <SelectMapLocationButton onClick={() => {}} />
+    }
+  }
 
   return (
     <>
@@ -93,15 +63,8 @@ const Homepage = () => {
       <div className="flex-1 flex">
         <Map/>
       </div>
-      { location.href == '/report' ? (
-        <ReportSightingButton
-          onClick={onClickReportSighting}
-        />
-      ) : (
-        <SelectMapLocationButton onClick={() => {}} />
-      )}
-
-    </>
+      {showButton()}
+     </>
   );
 };
 

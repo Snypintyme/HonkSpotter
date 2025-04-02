@@ -10,9 +10,12 @@ const SightingDetail = () => {
   const [imageData, setImageData] = useState('');
   const [error, setError] = useState(null);
   const { sightingId } = detailRoute.useParams()
+  const [initialLoad, setInitialLoad] = useState(true);
 
   // Find sighting, set the state, and fetch the image
   useEffect(() => {
+    if (!initialLoad) return;
+
     const fetchImage = async () => {
       if (!selectedSighting?.image) {
         return;
@@ -37,11 +40,15 @@ const SightingDetail = () => {
 
     if (!selectedSighting) {
       const sighting = gooseSightings.find((sighting) => sighting.id = sightingId);
-      if (sighting) setSelectedSighting(sighting);
+      if (sighting) {
+        setInitialLoad(false);
+        setSelectedSighting(sighting);
+      }
     }
 
     fetchImage();
-  }, [gooseSightings, selectedSighting, setSelectedSighting, sightingId]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gooseSightings]);
 
   useEffect(() => {
     return () => {
@@ -50,7 +57,6 @@ const SightingDetail = () => {
       }
     };
   }, [imageData]);
-
 
   if (!selectedSighting) return <p>Cannot find sighting</p>;
 
@@ -61,6 +67,7 @@ const SightingDetail = () => {
   }
 
   const onClickBack = () => {
+    console.log('backing');
     setSelectedSighting(null);
     router.navigate({ to: '/',})
   }

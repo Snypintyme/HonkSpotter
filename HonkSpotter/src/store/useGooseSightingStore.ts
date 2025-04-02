@@ -20,5 +20,8 @@ export const useGooseSightingStore = create<GooseSightingsState>()((set) => ({
     set((state: GooseSightingsState) => ({
       gooseSightings: state.gooseSightings.filter((sighting) => sighting.id !== id),
     })),
-  setSelectedSighting: (sighting: GooseSighting | null) => set({ selectedSighting: sighting }),
+  setSelectedSighting: (sighting: GooseSighting | null) => {
+    console.log("im being set to", sighting);
+    set({ selectedSighting: sighting })
+  }
 }));
