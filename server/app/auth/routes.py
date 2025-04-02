@@ -51,7 +51,13 @@ def login():
         security_logger.info(f"Successful login - IP: {request.remote_addr}")
         debug_logger.debug(f"User {email} logged in successfully")
 
-        access_token = create_access_token(identity=email)
+        additional_claims = {
+            "user_id": str(user.id),
+            "profile_picture": user.profile_picture,
+        }
+        access_token = create_access_token(
+            identity=email, additional_claims=additional_claims
+        )
         refresh_token = create_refresh_token(identity=email)
 
         response = make_response(jsonify(access_token=access_token))
@@ -95,7 +101,13 @@ def signup():
         security_logger.info(f"New user signed up - IP: {request.remote_addr}")
         debug_logger.debug(f"User {email} created successfully")
 
-        access_token = create_access_token(identity=email)
+        additional_claims = {
+            "user_id": str(new_user.id),
+            "profile_picture": new_user.profile_picture,
+        }
+        access_token = create_access_token(
+            identity=email, additional_claims=additional_claims
+        )
         refresh_token = create_refresh_token(identity=email)
         response = make_response(jsonify(access_token=access_token))
         set_refresh_cookies(response, refresh_token)
@@ -117,7 +129,20 @@ def refresh():
         security_logger.info(f"Token refreshed - IP: {request.remote_addr}")
         debug_logger.debug(f"Token refreshed for {current_user}")
 
-        new_access_token = create_access_token(identity=current_user)
+        user = User.query.filter_by(email=current_user).first()
+        if not user:
+            security_logger.warning(
+                f"User not found during token refresh - IP: {request.remote_addr}"
+            )
+            return jsonify({"error": "User not found"}), 404
+
+        additional_claims = {
+            "user_id": str(user.id),
+            "profile_picture": user.profile_picture,
+        }
+        new_access_token = create_access_token(
+            identity=current_user, additional_claims=additional_claims
+        )
         new_refresh_token = create_refresh_token(identity=current_user)
 
         response = make_response(jsonify(access_token=new_access_token))

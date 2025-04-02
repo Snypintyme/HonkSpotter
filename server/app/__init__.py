@@ -1,4 +1,5 @@
 """Flask application factory and configuration setup"""
+
 import os
 import logging
 from flask import Flask
@@ -78,21 +79,26 @@ def create_app():
 
     # Enable CORS for API endpoints
     # TODO: Fix this for prod (adjust origins for production)
-    origin = "https://honkspotter.rocks" if app.config['IS_PROD'] else "http://localhost:5174"
+    origin = (
+        "https://honkspotter.rocks"
+        if app.config["IS_PROD"]
+        else ["http://localhost:5174", "http://localhost:5173"]
+    )
     CORS(
         app,
         resources={r"/api/*": {"origins": origin}},
         supports_credentials=True,
+        automatic_options=True,
     )
 
     # Configure logging
     configure_logging(app)
 
     # Register blueprints
-    from app.auth.routes import auth_bp # pylint: disable=import-outside-toplevel
-    from app.main.routes import main_bp # pylint: disable=import-outside-toplevel
-    from app.users.routes import users_bp # pylint: disable=import-outside-toplevel
-    from app.image.routes import image_bp # pylint: disable=import-outside-toplevel
+    from app.auth.routes import auth_bp  # pylint: disable=import-outside-toplevel
+    from app.main.routes import main_bp  # pylint: disable=import-outside-toplevel
+    from app.users.routes import users_bp  # pylint: disable=import-outside-toplevel
+    from app.image.routes import image_bp  # pylint: disable=import-outside-toplevel
 
     app.register_blueprint(auth_bp, url_prefix="/api")
     app.register_blueprint(main_bp, url_prefix="/api")

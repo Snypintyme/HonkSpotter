@@ -39,7 +39,7 @@ def create_users():
             email=f"test{i}@test.com",
             username=f"test{i}",
             description=f"Test user {i} who loves documenting the geese of Kitchener-Waterloo.",
-            profile_picture=f"https://my-bucket.s3.amazonaws.com/profile-pictures/user{i}.jpg",
+            profile_picture="",
             is_banned=False,
         )
         user.set_password("password123")
