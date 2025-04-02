@@ -3,8 +3,7 @@ import router from '@/router';
 import { useGooseSightingStore } from '@/store/useGooseSightingStore';
 
 const SightingList = () => {
-  const { gooseSightings, selectedSighting, setSelectedSighting } = useGooseSightingStore();
-  console.log(selectedSighting);
+  const { gooseSightings, setSelectedSighting } = useGooseSightingStore();
   const onClickSelectedSighting = (sighting: GooseSighting) => {
     setSelectedSighting(sighting);
     router.navigate({ to: `/detail/${sighting.id}`});
