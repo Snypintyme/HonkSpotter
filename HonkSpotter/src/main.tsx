@@ -5,6 +5,7 @@ import router from './router';
 import './index.css';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SnackbarProvider } from 'notistack';
+import TokenRefreshProvider from './components/TokenRefreshProvider';
 
 declare module '@tanstack/react-router' {
   interface Register {
@@ -21,10 +22,11 @@ if (!rootElement.innerHTML) {
     <StrictMode>
       <QueryClientProvider client={queryClient}>
         <SnackbarProvider maxSnack={3}>
-          <RouterProvider router={router} />
+          <TokenRefreshProvider>
+            <RouterProvider router={router} />
+          </TokenRefreshProvider>
         </SnackbarProvider>
       </QueryClientProvider>
     </StrictMode>
   );
 }
-

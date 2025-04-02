@@ -16,12 +16,19 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
 
   useEffect(() => {
     const doRefresh = async () => {
-      await refreshAccessToken();
-      setTriedRefresh(true);
+      try {
+        await refreshAccessToken();
+      } catch (error) {
+        console.error('Failed to refresh token:', error);
+      } finally {
+        setTriedRefresh(true);
+      }
     };
-    if (!useAuthStore.getState().accessToken) {
+    console.log('accessToken', accessToken);
+    if (!accessToken) {
       doRefresh();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
