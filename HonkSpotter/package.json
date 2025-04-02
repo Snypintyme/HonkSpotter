@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "vite preview --port 5173",
+    "prod": "npm run build && npm run preview"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.3",
