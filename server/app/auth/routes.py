@@ -1,3 +1,4 @@
+import re
 import logging
 from flask import Blueprint, request, jsonify, make_response
 from flask_jwt_extended import (
@@ -68,6 +69,21 @@ def login():
         security_logger.error(f"Login error: {str(e)}", exc_info=True)
         return jsonify({"error": "Internal server error"}), 500
 
+def check_password_complexity(password):
+    if len(password) < 8:
+        return False
+    
+    categories = 0
+    if re.search(r'[A-Z]', password): 
+        categories += 1
+    if re.search(r'[a-z]', password): 
+        categories += 1
+    if re.search(r'[0-9]', password): 
+        categories += 1
+    if re.search(r'[^A-Za-z0-9]', password): 
+        categories += 1
+    
+    return categories >= 4
 
 @auth_bp.route("/signup", methods=["POST"])
 def signup():
@@ -88,6 +104,14 @@ def signup():
                 f"Signup attempt failed: Missing email or password - IP: {request.remote_addr}"
             )
             return jsonify({"msg": "Missing email or password"}), 400
+
+        if not check_password_complexity(password):
+            security_logger.warning(
+                f"Weak password attempt for {email} - IP: {request.remote_addr}"
+            )
+            return jsonify({
+                "error": "Password must be at least 8 characters and include at least one of each: uppercase, lowercase, number, special character"
+            }), 400
 
         if User.query.filter_by(email=email).first():
             return jsonify({"msg": "User already exists"}), 409
