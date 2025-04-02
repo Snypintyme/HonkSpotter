@@ -4,6 +4,7 @@ import { jwtDecode } from 'jwt-decode';
 interface DecodedToken {
   identity: string;
   user_id: string;
+  username: string;
   profile_picture: string;
 }
 
@@ -12,6 +13,7 @@ interface AuthState {
   setAccessToken: (token: string | null) => void;
   clearAccessToken: () => void;
   getUserId: () => string | null;
+  getUsernameFallback: () => string | null;
   getProfilePictureId: () => string | null;
 }
 
@@ -26,6 +28,18 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       const decodedToken = jwtDecode<DecodedToken>(accessToken);
       return decodedToken.user_id || null;
+    } catch (error) {
+      console.error('Failed to decode JWT:', error);
+      return null;
+    }
+  },
+  getUsernameFallback: () => {
+    const accessToken = get().accessToken;
+    if (!accessToken) return null;
+
+    try {
+      const decodedToken = jwtDecode<DecodedToken>(accessToken);
+      return decodedToken.username?.charAt(0)?.toUpperCase() || null;
     } catch (error) {
       console.error('Failed to decode JWT:', error);
       return null;
