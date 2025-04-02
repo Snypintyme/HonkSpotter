@@ -3,7 +3,7 @@
 import logging
 import bleach
 
-from flask import Blueprint, request, jsonify, make_response, current_app
+from flask import Blueprint, request, jsonify, make_response
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from app.models.sightings import Sighting
@@ -17,7 +17,6 @@ debug_logger = logging.getLogger("debug")
 
 @main_bp.route("/test", methods=["GET"])
 @jwt_required()
-@limiter.exempt
 def test():
     current_user = get_jwt_identity()
     debug_logger.debug(f"Test endpoint accessed by {current_user}")
@@ -96,7 +95,6 @@ def submit_sighting():
 
 
 @main_bp.route("/sightings", methods=["GET"])
-@limiter.exempt
 def sightings():
     """
     GET /api/sightings

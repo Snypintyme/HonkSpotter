@@ -101,7 +101,6 @@ def sanitize_image(file_stream, s3_filename):
 
 @image_bp.route("/image-upload", methods=["POST"])
 @jwt_required()
-@limiter.limit("2/minute")
 def upload_image():
     """
     POST /api/image-upload
@@ -179,7 +178,6 @@ def delete_image(image_id):
         return jsonify({"error": "An unexpected error occurred"}), 500
 
 @image_bp.route("/image/<image_id>", methods=["GET"])
-@limiter.exempt
 def get_image(image_id):
     """
     GET /api/image/<image_id>

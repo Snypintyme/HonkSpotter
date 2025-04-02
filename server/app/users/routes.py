@@ -2,7 +2,7 @@ import logging
 import uuid
 import bleach
 
-from flask import Blueprint, request, jsonify, current_app
+from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from app import db
@@ -13,7 +13,6 @@ security_logger = logging.getLogger("security")
 debug_logger = logging.getLogger("debug")
 
 @users_bp.route("/user/<string:user_id>", methods=["GET"])
-@limiter.exempt
 @jwt_required()
 def get_user(user_id):
     """
