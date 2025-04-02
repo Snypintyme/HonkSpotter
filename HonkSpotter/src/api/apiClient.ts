@@ -2,6 +2,8 @@ import axios, { AxiosRequestHeaders, AxiosResponse } from 'axios';
 import { useAuthStore } from '@/store/useAuthStore';
 import { enqueueSnackbar } from 'notistack';
 
+const apiURL = import.meta.env.VITE_API_URL;
+
 const getCookieValue = (name: string): string | null => {
   const matches = document.cookie.match(
     // eslint-disable-next-line no-useless-escape
@@ -9,8 +11,6 @@ const getCookieValue = (name: string): string | null => {
   );
   return matches ? decodeURIComponent(matches[1]) : null;
 };
-const isProd = false;
-const apiURL = isProd ? 'https://honkspotter.rocks' : 'http://localhost:8000';
 
 export const refreshAccessToken = async (): Promise<string> => {
   const accessToken = useAuthStore.getState().accessToken;
@@ -26,7 +26,7 @@ export const refreshAccessToken = async (): Promise<string> => {
 };
 
 const apiClient = axios.create({
-  baseURL: `${apiURL}/api`, // TODO: move to env
+  baseURL: `${apiURL}/api`,
   withCredentials: true,
 });
 
