@@ -1,5 +1,5 @@
 import { Link, useNavigate } from '@tanstack/react-router';
-import logo from '@/assets/goose.jpg';
+import logo from '@/assets/goose.png';
 import { Button } from './ui/button';
 import { useSnackbar } from 'notistack';
 import { useAuthStore } from '@/store/useAuthStore';
