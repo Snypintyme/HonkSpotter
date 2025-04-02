@@ -10,8 +10,6 @@ from flask_jwt_extended import (
     set_refresh_cookies,
     unset_jwt_cookies,
 )
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
 from app import db
 from app.models.user import User
 
@@ -19,7 +17,6 @@ auth_bp = Blueprint("auth", __name__)
 
 security_logger = logging.getLogger("security")
 debug_logger = logging.getLogger("debug")
-limiter = Limiter(get_remote_address, app=current_app, default_limits=["10 per minute"])
 
 @auth_bp.route("/login", methods=["POST"])
 def login():

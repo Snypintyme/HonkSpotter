@@ -7,15 +7,13 @@ import json
 
 from flask import Blueprint, request, jsonify, current_app
 from flask_jwt_extended import jwt_required
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
+
 from app.models.images import Image
 from app import db
 from PIL import Image as PILImage
 
 image_bp = Blueprint("image_upload", __name__)
 debug_logger = logging.getLogger("debug")
-limiter = Limiter(get_remote_address, app=current_app, default_limits=["10 per minute"])
 
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
 
@@ -103,6 +101,7 @@ def sanitize_image(file_stream, s3_filename):
 
 @image_bp.route("/image-upload", methods=["POST"])
 @jwt_required()
+@limiter.limit("2/minute")
 def upload_image():
     """
     POST /api/image-upload

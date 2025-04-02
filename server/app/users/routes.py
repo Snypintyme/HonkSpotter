@@ -4,8 +4,6 @@ import bleach
 
 from flask import Blueprint, request, jsonify, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
 
 from app import db
 from app.models.user import User
@@ -13,7 +11,6 @@ from app.models.user import User
 users_bp = Blueprint("users", __name__)
 security_logger = logging.getLogger("security")
 debug_logger = logging.getLogger("debug")
-limiter = Limiter(get_remote_address, app=current_app, default_limits=["10 per minute"])
 
 @users_bp.route("/user/<string:user_id>", methods=["GET"])
 @limiter.exempt
