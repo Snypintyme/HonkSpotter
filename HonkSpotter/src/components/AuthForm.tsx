@@ -102,7 +102,22 @@ export function AuthForm({ authType, className, ...props }: AuthFormProps) {
                 <Input
                   id="password"
                   type="password"
-                  {...register('password', { required: 'Please enter your password' })}
+                  {...register('password', { 
+                    required: 'Please enter your password',
+                    minLength: {
+                      value: 8,
+                      message: 'Password must be at least 8 characters'
+                    },
+                    validate: (value) => {
+                      return [
+                        /[A-Z]/.test(value),
+                        /[a-z]/.test(value),
+                        /[0-9]/.test(value),
+                        /[^A-Za-z0-9]/.test(value)
+                      ].filter(Boolean).length >= 4 || 
+                      'Password must include at least one of each: uppercase, lowercase, number, special character'
+                    }
+                  })}
                 />
                 <p className="text-red-500 text-sm min-h-[1.25rem]">
                   {errors.password ? errors.password.message : <span className="invisible">placeholder</span>}
