@@ -1,8 +1,12 @@
 """Main application routes"""
 
 import logging
-from flask import Blueprint, request, jsonify, make_response
+import bleach
+
+from flask import Blueprint, request, jsonify, make_response, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 from app.models.sightings import Sighting
 from app.models.user import User
@@ -12,10 +16,11 @@ import uuid
 main_bp = Blueprint("main", __name__)
 security_logger = logging.getLogger("security")
 debug_logger = logging.getLogger("debug")
-
+limiter = Limiter(get_remote_address, app=current_app, default_limits=["10 per minute"])
 
 @main_bp.route("/test", methods=["GET"])
 @jwt_required()
+@limiter.exempt
 def test():
     current_user = get_jwt_identity()
     debug_logger.debug(f"Test endpoint accessed by {current_user}")
@@ -43,10 +48,10 @@ def submit_sighting():
         if not data:
             raise Exception("No data provided")
 
-        name = data.get("name")
-        notes = data.get("notes")
-        coords = data.get("coords")
-        image = data.get("image")
+        name = bleach.clean(data.get("name"))
+        notes = bleach.clean(data.get("notes"))
+        coords = bleach.clean(data.get("coords"))
+        image = bleach.clean(data.get("image"))
 
         goose_sighting = Sighting(
             name=name,
@@ -94,6 +99,7 @@ def submit_sighting():
 
 
 @main_bp.route("/sightings", methods=["GET"])
+@limiter.exempt
 def sightings():
     """
     GET /api/sightings
