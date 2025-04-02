@@ -27,7 +27,7 @@ const listRoute = createRoute({
 
 export const detailRoute = createRoute({
   getParentRoute: () => indexRoute,
-  path: '/detail/$sightingId', // Correct syntax for dynamic params
+  path: '/detail/$sightingId',
   component: SightingDetail,
 });
 
@@ -49,7 +49,6 @@ const signupRoute = createRoute({
   component: () => <Authentication authType={AuthType.Signup} />,
 });
 
-
 const userProfileRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/user/$userId',
@@ -67,7 +66,7 @@ const routeTree = rootRoute.addChildren([
   reportRoute,
   loginRoute,
   signupRoute,
-  userProfileRoute
+  userProfileRoute,
 ]);
 
 const router = createRouter({

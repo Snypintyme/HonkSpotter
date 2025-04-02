@@ -17,14 +17,32 @@ const UserProfile = () => {
   const navigate = useNavigate();
 
   const {
-    isPending,
-    error,
+    isPending: isUserPending,
+    error: userError,
     data: user,
   } = useQuery<User>({
     queryKey: ['user', userId],
     queryFn: async () => {
       const response = await apiClient.get(`${ApiEndpoints.UserProfile}/${userId}`);
       return response.data.user;
+    },
+    enabled: !!accessToken,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    retry: (failureCount, error: any) => {
+      if (error.response?.status === 404) return false;
+      return failureCount < 3;
+    },
+  });
+
+  const {
+    isPending: isSightingsPending,
+    error: sightingsError,
+    data: sightings,
+  } = useQuery({
+    queryKey: ['sightings', userId],
+    queryFn: async () => {
+      const response = await apiClient.get(`${ApiEndpoints.GetSightings}?user_id=${userId}`);
+      return response.data.sightings;
     },
     enabled: !!accessToken,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -41,11 +59,11 @@ const UserProfile = () => {
     }
   }, [userId, navigate, accessToken, enqueueSnackbar]);
 
-  if (isPending) {
+  if (isUserPending || isSightingsPending) {
     return <div className="flex justify-center items-center h-screen w-screen">Loading...</div>;
   }
 
-  if (isAxiosError(error) && error?.response?.status === 404) {
+  if (isAxiosError(userError) && userError?.response?.status === 404) {
     return (
       <div className="flex flex-col justify-center items-center h-screen w-screen">
         <h2 className="text-xl text-red-500">User Not Found</h2>
@@ -57,16 +75,25 @@ const UserProfile = () => {
     );
   }
 
-  if (error) {
+  if (userError) {
     return (
       <div className="flex flex-col justify-center items-center h-screen w-screen">
-        <h2 className="text-xl text-red-500">Error</h2>
-        <p>{error.message}</p>
+        <h2 className="text-xl text-red-500">Error Loading User Info</h2>
+        <p>{userError.message}</p>
       </div>
     );
   }
 
-  return <ProfileCard user={user} />;
+  if (sightingsError) {
+    return (
+      <div className="flex flex-col justify-center items-center h-screen w-screen">
+        <h2 className="text-xl text-red-500">Error Loading User Sightings</h2>
+        <p>{sightingsError.message}</p>
+      </div>
+    );
+  }
+
+  return <ProfileCard user={user} sightings={sightings} />;
 };
 
 export default UserProfile;

@@ -11,7 +11,7 @@ const fetchImage = async (imageId: string): Promise<string> => {
   return URL.createObjectURL(response.data);
 };
 
-export const useImage = (imageId: string | undefined) => {
+export const useImage = (imageId: string | null) => {
   const {
     data: image,
     error,
@@ -33,4 +33,3 @@ export const useImage = (imageId: string | undefined) => {
 
   return { image, error, isLoading };
 };
-

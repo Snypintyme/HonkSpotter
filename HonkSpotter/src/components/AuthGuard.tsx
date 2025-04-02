@@ -13,7 +13,6 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
   const [triedRefresh, setTriedRefresh] = useState(false);
-  console.log('checking auth guard', accessToken);
 
   useEffect(() => {
     const doRefresh = async () => {
@@ -21,7 +20,6 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
       setTriedRefresh(true);
     };
     if (!useAuthStore.getState().accessToken) {
-      console.log('refreshing access token');
       doRefresh();
     }
   }, []);
@@ -41,4 +39,3 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
 };
 
 export default AuthGuard;
-

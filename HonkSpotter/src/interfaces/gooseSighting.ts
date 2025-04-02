@@ -1,11 +1,12 @@
 import { Coordinate } from './coordinate';
+import { User } from './user';
 
 export interface GooseSighting {
   id: string;
   name: string;
-  notes?: string;
+  notes: string | null;
   coords: Coordinate;
-  image?: string;
-  user: string;
+  image: string | null;
+  user: User;
   created_date: Date;
 }

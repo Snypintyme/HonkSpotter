@@ -1,4 +1,5 @@
 """Sighting model definition"""
+
 import uuid
 import re
 import datetime
@@ -9,9 +10,11 @@ from dataclasses import dataclass
 from app.models.user import User
 from app import db
 
+
 @dataclass
 class Sighting(db.Model):
     """Sighting record"""
+
     __tablename__ = "sightings"
     id: str
     name: str
@@ -30,7 +33,7 @@ class Sighting(db.Model):
     user = relationship("User", back_populates="posts")
     created_date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
 
-    @validates('name')
+    @validates("name")
     def validate_name(self, key, name):
         """Validate name field"""
         if not isinstance(name, str):
@@ -41,14 +44,14 @@ class Sighting(db.Model):
             raise ValueError("Name cannot be longer than 80 characters")
         return name
 
-    @validates('notes')
+    @validates("notes")
     def validate_notes(self, key, notes):
         """Validate observation notes"""
         if notes is not None and not isinstance(notes, str):
             raise TypeError("Notes must be a string")
         return notes
 
-    @validates('coords')
+    @validates("coords")
     def validate_coords(self, key, coords):
         """Validate coordinate format"""
         if not isinstance(coords, str):
@@ -56,7 +59,7 @@ class Sighting(db.Model):
 
         # Improved regex pattern for latitude,longitude format
         # Matches: "34.0522,-118.2437" or "34.0522, -118.2437" (with optional space)
-        pattern = r'^(-?\d+(\.\d+)?),\s*(-?\d+(\.\d+)?)$'
+        pattern = r"^(-?\d+(\.\d+)?),\s*(-?\d+(\.\d+)?)$"
         match = re.match(pattern, coords)
 
         if not match:
@@ -76,7 +79,7 @@ class Sighting(db.Model):
         except ValueError:
             raise ValueError("Coordinates must contain valid numbers")
 
-    @validates('image')
+    @validates("image")
     def validate_image(self, key, image):
         """Validate image id"""
         if not image:
@@ -113,10 +116,10 @@ class Sighting(db.Model):
         if self.user:
             sighting_dict["user"] = {
                 "id": str(self.user.id),
-                "email": self.user.email,
                 "username": self.user.username,
                 "description": self.user.description,
                 "profile_picture": self.user.profile_picture,
+                "is_banned": self.user.is_banned,
             }
         else:
             sighting_dict["user"] = None

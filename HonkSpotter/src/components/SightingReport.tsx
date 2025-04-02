@@ -57,12 +57,12 @@ const ReportSighting = () => {
       console.log(error.message, '\n', error.stack);
     }
 
-    router.navigate({ to: '/'})
+    router.navigate({ to: '/' });
   };
 
   return (
     <>
-      <Button variant="link" onClick={() => router.navigate({ to: '/'})} className="text-blue-500 px-0">
+      <Button variant="link" onClick={() => router.history.back()} className="text-blue-500 px-0">
         &larr; Back
       </Button>
       <form onSubmit={handleSubmit} className="space-y-4 flex flex-col h-full">
