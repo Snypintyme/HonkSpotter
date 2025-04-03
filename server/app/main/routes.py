@@ -1,6 +1,8 @@
 """Main application routes"""
 
 import logging
+import bleach
+
 from flask import Blueprint, request, jsonify, make_response
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
@@ -12,7 +14,6 @@ import uuid
 main_bp = Blueprint("main", __name__)
 security_logger = logging.getLogger("security")
 debug_logger = logging.getLogger("debug")
-
 
 @main_bp.route("/test", methods=["GET"])
 @jwt_required()
@@ -43,10 +44,10 @@ def submit_sighting():
         if not data:
             raise Exception("No data provided")
 
-        name = data.get("name")
-        notes = data.get("notes")
-        coords = data.get("coords")
-        image = data.get("image")
+        name = bleach.clean(data.get("name"))
+        notes = bleach.clean(data.get("notes"))
+        coords = bleach.clean(data.get("coords"))
+        image = bleach.clean(data.get("image"))
 
         goose_sighting = Sighting(
             name=name,

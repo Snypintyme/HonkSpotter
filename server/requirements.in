@@ -10,3 +10,4 @@ pytest
 Faker
 boto3==1.37.23
 pillow
+bleach

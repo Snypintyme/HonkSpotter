@@ -1,14 +1,16 @@
 import logging
+import uuid
+import bleach
+
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
+
 from app import db
 from app.models.user import User
-import uuid
 
 users_bp = Blueprint("users", __name__)
 security_logger = logging.getLogger("security")
 debug_logger = logging.getLogger("debug")
-
 
 @users_bp.route("/user/<string:user_id>", methods=["GET"])
 @jwt_required()
@@ -117,13 +119,13 @@ def update_profile():
             existing_user = User.query.filter_by(username=data["username"]).first()
             if existing_user and existing_user.id != user.id:
                 return jsonify({"error": "Username already taken"}), 409
-            user.username = data["username"]
+            user.username = bleach.clean(data["username"])
 
         if "description" in data:
-            user.description = data["description"]
+            user.description = bleach.clean(data["description"])
 
         if "profile_picture" in data:
-            user.profile_picture = data["profile_picture"]
+            user.profile_picture = bleach.clean(data["profile_picture"])
 
         # Save changes
         db.session.commit()

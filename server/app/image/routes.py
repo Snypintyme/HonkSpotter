@@ -7,6 +7,7 @@ import json
 
 from flask import Blueprint, request, jsonify, current_app
 from flask_jwt_extended import jwt_required
+
 from app.models.images import Image
 from app import db
 from PIL import Image as PILImage

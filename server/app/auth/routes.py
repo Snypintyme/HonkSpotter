@@ -18,7 +18,6 @@ auth_bp = Blueprint("auth", __name__)
 security_logger = logging.getLogger("security")
 debug_logger = logging.getLogger("debug")
 
-
 @auth_bp.route("/login", methods=["POST"])
 def login():
     try:
