@@ -74,7 +74,7 @@ const ProfileCard = ({ user, sightings }: ProfileCardProps) => {
 
         {/* Sightings Section */}
         <div className="mt-8">
-          <h2 className="text-xl font-semibold mb-4 text-gray-700">Sightings</h2>
+          <h2 className="text-xl font-semibold mb-4 text-gray-700">{`Sightings${sightings.length > 0 ? `: ${sightings.length} reports` : ''}`}</h2>
           {!sightings.length ? (
             <p className="text-gray-600">This user has not reported any sightings yet.</p>
           ) : (
