@@ -10,6 +10,7 @@ import { Label } from './ui/label';
 import ImageUpload from './ImageUpload';
 import router from '@/router';
 import { useCoordinatesStore } from '@/store/useCoordinatesStore';
+import { enqueueSnackbar } from 'notistack';
 
 const ReportSighting = () => {
   const { addGooseSighting } = useGooseSightingStore();
@@ -65,13 +66,16 @@ const ReportSighting = () => {
         created_date: new Date(sighting.created_date),
       };
       addGooseSighting(gooseSighting);
+      setCoordinates(null);
+      router.navigate({ to: '/' });
     } catch (e: unknown) {
       const error = e as AxiosError;
       console.log(error.message, '\n', error.stack);
+      enqueueSnackbar('Failed to report goose sighting', {
+        variant: 'error',
+        autoHideDuration: 1000,
+      })
     }
-
-    setCoordinates(null);
-    router.navigate({ to: '/' });
   };
 
   return (
