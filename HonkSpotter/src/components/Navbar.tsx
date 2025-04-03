@@ -15,20 +15,19 @@ const Navbar = () => {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
-  // Call a temporary GET /api/test endpoint
-  const handleTestApi = async () => {
-    try {
-      const response = await apiClient.get('/test', { withCredentials: true });
-      const msg = `Test API success: ${JSON.stringify(response.data)}`;
-      enqueueSnackbar(msg, { variant: 'success' });
-      console.log(msg);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      const msg = `Test API error: ${error.message}`;
-      enqueueSnackbar(`Test API error: ${error.message}`, { variant: 'error' });
-      console.log(msg);
-    }
-  };
+  // const handleTestApi = async () => {
+  //   try {
+  //     const response = await apiClient.get('/test', { withCredentials: true });
+  //     const msg = `Test API success: ${JSON.stringify(response.data)}`;
+  //     enqueueSnackbar(msg, { variant: 'success' });
+  //     console.log(msg);
+  //     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  //   } catch (error: any) {
+  //     const msg = `Test API error: ${error.message}`;
+  //     enqueueSnackbar(`Test API error: ${error.message}`, { variant: 'error' });
+  //     console.log(msg);
+  //   }
+  // };
 
   const handleLogout = async () => {
     try {
@@ -87,9 +86,9 @@ const Navbar = () => {
             </div>
           </Link>
           <div className="flex items-center space-x-4">
-            <Button variant="default" onClick={handleTestApi}>
+            {/* <Button variant="default" onClick={handleTestApi}>
               Test API
-            </Button>
+            </Button> */}
             {accessToken ? (
               <div className="relative" ref={dropdownRef}>
                 <ProfilePicture
