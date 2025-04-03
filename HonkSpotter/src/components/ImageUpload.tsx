@@ -65,8 +65,13 @@ const ImageUpload = ({ onImageChange }: ImageUploadProps) => {
       return;
     }
 
-    setPreview(URL.createObjectURL(file));
+    const objectUrl = URL.createObjectURL(file);
+    setPreview(objectUrl);
     uploadImageMutation.mutate(file);
+
+    return () => {
+      URL.revokeObjectURL(objectUrl);
+    };
   };
 
   const handleDeleteImage = (e: React.MouseEvent<HTMLButtonElement>) => {
