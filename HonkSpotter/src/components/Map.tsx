@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react';
-import { MapContainer, Marker, Popup, TileLayer, useMap } from 'react-leaflet';
+import { MapContainer, Marker, Popup, TileLayer, useMap, useMapEvents } from 'react-leaflet';
 import { useGooseSightingStore } from '@/store/useGooseSightingStore';
 import { LatLngExpression, Icon } from 'leaflet';
 import router from '@/router';
+import { useCoordinatesStore } from '@/store/useCoordinatesStore';
 
 const DEFAULT_CENTER: LatLngExpression = [43.4643, -80.5204]; // Default to Waterloo
 const DEFAULT_ZOOM = 11;
@@ -11,11 +12,19 @@ const DEFAULT_SELECTED_ZOOM = 15;
 const defaultIcon = new Icon({
   iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
   popupAnchor: [0, -41],
+  iconAnchor: [14, 38],  // Align icon to actual coords
 });
 
 const selectedIcon = new Icon({
   iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
   popupAnchor: [0, -41],
+  iconAnchor: [14, 38],
+});
+
+const chooseCoordsIcon = new Icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+  popupAnchor: [0, -41],
+  iconAnchor: [14, 38],
 });
 
 const ChangeView = ({ center, zoom }: { center: LatLngExpression; zoom: number }) => {
@@ -26,6 +35,7 @@ const ChangeView = ({ center, zoom }: { center: LatLngExpression; zoom: number }
 
 const Map = () => {
   const { gooseSightings, selectedSighting, setSelectedSighting } = useGooseSightingStore();
+  const { coordinates, mapShouldPickCoords, setCoordinates } = useCoordinatesStore();
   const [initialMapLoaded, setInitialMapLoaded] = useState<boolean>(false);
 
   // When goose sightings are loaded, update the default map center and zoom
@@ -55,6 +65,56 @@ const Map = () => {
   const activeCenter = defaultSightingCenter ?? selectedSightingCenter;
   const activeZoom = defaultSightingZoom ?? selectedSightingZoom;
 
+  function CustomMarker() {
+    useMapEvents({
+      click: (e) => {
+        console.log(e.latlng);
+        setCoordinates({ lat: e.latlng.lat, lng: e.latlng.lng });
+      }
+    });
+
+    return coordinates ? (
+      <Marker
+        position={[coordinates.lat, coordinates.lng]}
+        key="report-marker"
+        icon={chooseCoordsIcon}
+        eventHandlers={{
+          mouseover: (e) => {
+            e.target.openPopup();
+          },
+          mouseout: (e) => {
+            e.target.closePopup();
+          },
+        }}
+      >
+        <Popup closeButton={false}>Reported Location</Popup>
+      </Marker>
+    ) : null;
+  }
+
+  const markers = mapShouldPickCoords ? <CustomMarker/> : gooseSightings.map((sighting) => {
+    return (
+      <Marker
+        key={sighting.id}
+        position={[sighting.coords.lat, sighting.coords.lng]}
+        icon={sighting.id === selectedSighting?.id ? selectedIcon : defaultIcon}
+        eventHandlers={{
+          click: () => {
+            setSelectedSighting(sighting);
+          },
+          mouseover: (e) => {
+            e.target.openPopup();
+          },
+          mouseout: (e) => {
+            e.target.closePopup();
+          },
+        }}
+      >
+        <Popup closeButton={false}>{sighting.name}</Popup>
+      </Marker>
+    );
+  });
+
   return (
     <MapContainer center={DEFAULT_CENTER} zoom={DEFAULT_ZOOM}>
       {activeCenter && <ChangeView center={activeCenter} zoom={activeZoom ?? DEFAULT_ZOOM} />}
@@ -62,26 +122,7 @@ const Map = () => {
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
-      {gooseSightings.map((sighting) => (
-        <Marker
-          key={sighting.id}
-          position={[sighting.coords.lat, sighting.coords.lng]}
-          icon={sighting.id === selectedSighting?.id ? selectedIcon : defaultIcon}
-          eventHandlers={{
-            click: () => {
-              setSelectedSighting(sighting);
-            },
-            mouseover: (e) => {
-              e.target.openPopup();
-            },
-            mouseout: (e) => {
-              e.target.closePopup();
-            },
-          }}
-        >
-          <Popup closeButton={false}>{sighting.name}</Popup>
-        </Marker>
-      ))}
+      {markers}
     </MapContainer>
   );
 };

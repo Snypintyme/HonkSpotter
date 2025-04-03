@@ -1,5 +1,5 @@
 import { useGooseSightingStore } from '@/store/useGooseSightingStore';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input, Textarea } from '@/components/ui/input';
 import { GooseSighting } from '@/interfaces/gooseSighting';
@@ -9,9 +9,11 @@ import { AxiosError } from 'axios';
 import { Label } from './ui/label';
 import ImageUpload from './ImageUpload';
 import router from '@/router';
+import { useCoordinatesStore } from '@/store/useCoordinatesStore';
 
 const ReportSighting = () => {
   const { addGooseSighting } = useGooseSightingStore();
+  const { coordinates, setCoordinates, setMapShouldPickCoords } = useCoordinatesStore();
 
   const [formData, setFormData] = useState({
     name: '',
@@ -21,6 +23,16 @@ const ReportSighting = () => {
     image: '',
   });
 
+  useEffect(() => {
+    if (coordinates) setFormData({ ...formData, lat: String(coordinates.lat), lng: String(coordinates.lng) });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [coordinates])
+
+  // Set map to choose coords on load
+  useEffect(() => {
+    setMapShouldPickCoords(true);
+  }, [])
+
   const handleChange = (e: { target: { name: string; value: string } }) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -28,7 +40,7 @@ const ReportSighting = () => {
 
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
-    // Handle form submission (e.g., send data to an API)
+
     const postData = {
       name: formData.name,
       notes: formData.notes,
@@ -57,6 +69,7 @@ const ReportSighting = () => {
       console.log(error.message, '\n', error.stack);
     }
 
+    setCoordinates(null);
     router.navigate({ to: '/' });
   };
 
@@ -76,7 +89,6 @@ const ReportSighting = () => {
           placeholder="Write any notes here..."
           value={formData.notes}
           onChange={handleChange}
-          required
         />
 
         <div className="flex flex-row">
@@ -86,9 +98,9 @@ const ReportSighting = () => {
               name="lat"
               placeholder="Latitude"
               value={formData.lat}
-              onChange={handleChange}
               className="w-fit"
               required
+              readOnly
             />
           </div>
           <div>
@@ -97,9 +109,9 @@ const ReportSighting = () => {
               name="lng"
               placeholder="Longitude"
               value={formData.lng}
-              onChange={handleChange}
               className="w-fit"
               required
+              readOnly
             />
           </div>
         </div>

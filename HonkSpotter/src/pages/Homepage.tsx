@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import {  useEffect } from 'react';
 import Map from '@/components/Map';
 import { useGooseSightingStore } from '@/store/useGooseSightingStore';
 import { GooseSighting } from '@/interfaces/gooseSighting';
@@ -31,9 +31,9 @@ const Homepage = () => {
     if (location.pathname === '/') router.navigate({ to: '/sightings' })
   }, [location.pathname]);
 
-  const onClickReportSighting = useCallback(() => {
+  const onClickReportSighting = () => {
     router.navigate({ to: '/report'})
-  }, []);
+  };
 
   const showButton = () => {
     const pathname = location.pathname;
