@@ -60,6 +60,11 @@ const ImageUpload = ({ onImageChange }: ImageUploadProps) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    if (!file.type.startsWith('image/')) {
+      console.error('Selected file is not an image');
+      return;
+    }
+
     setPreview(URL.createObjectURL(file));
     uploadImageMutation.mutate(file);
   };
