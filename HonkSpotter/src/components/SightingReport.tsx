@@ -31,6 +31,7 @@ const ReportSighting = () => {
   // Set map to choose coords on load
   useEffect(() => {
     setMapShouldPickCoords(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleChange = (e: { target: { name: string; value: string } }) => {
