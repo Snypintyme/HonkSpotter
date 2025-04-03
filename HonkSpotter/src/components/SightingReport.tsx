@@ -25,13 +25,13 @@ const ReportSighting = () => {
 
   useEffect(() => {
     if (coordinates) setFormData({ ...formData, lat: String(coordinates.lat), lng: String(coordinates.lng) });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [coordinates])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [coordinates]);
 
   // Set map to choose coords on load
   useEffect(() => {
     setMapShouldPickCoords(true);
-  }, [])
+  }, []);
 
   const handleChange = (e: { target: { name: string; value: string } }) => {
     const { name, value } = e.target;
@@ -83,39 +83,18 @@ const ReportSighting = () => {
       <Input name="name" placeholder="Name" value={formData.name} onChange={handleChange} required />
 
       <Label htmlFor="notes">Notes</Label>
-      <Textarea
-        name="notes"
-        placeholder="Write any notes here..."
-        value={formData.notes}
-        onChange={handleChange}
-      />
+      <Textarea name="notes" placeholder="Write any notes here..." value={formData.notes} onChange={handleChange} />
 
       <div className="flex flex-row">
         <div className="mr-4">
           <Label htmlFor="lat">Latitude</Label>
-          <Input
-            name="lat"
-            placeholder="Latitude"
-            value={formData.lat}
-            className="w-fit"
-            required
-            readOnly
-          />
+          <Input name="lat" placeholder="Latitude" value={formData.lat} className="w-fit" required readOnly />
         </div>
         <div>
           <Label htmlFor="lng">Longitude</Label>
-          <Input
-            name="lng"
-            placeholder="Longitude"
-            value={formData.lng}
-            className="w-fit"
-            required
-            readOnly
-          />
+          <Input name="lng" placeholder="Longitude" value={formData.lng} className="w-fit" required readOnly />
         </div>
       </div>
-
-      <Label htmlFor="image">Image</Label>
       <ImageUpload onImageChange={(image) => setFormData((prev) => ({ ...prev, image }))} />
       <Button type="submit" className="w-fit bg-green-400 hover:bg-green-500 mt-auto">
         Submit Goose Sighting

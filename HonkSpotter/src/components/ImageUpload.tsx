@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { Input } from './ui/input';
 import apiClient from '@/api/apiClient';
 import { ApiEndpoints } from '@/enums/apiEndpoints';
+import { Button } from './ui/button';
+import { Label } from './ui/label';
 
 interface ImageUploadProps {
   onImageChange: (image: string) => void;
@@ -11,6 +13,7 @@ interface ImageUploadProps {
 const ImageUpload = ({ onImageChange }: ImageUploadProps) => {
   const [preview, setPreview] = useState<string>('');
   const [currentImageId, setCurrentImageId] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const uploadImageMutation = useMutation({
     mutationFn: async (file: File) => {
@@ -44,6 +47,9 @@ const ImageUpload = ({ onImageChange }: ImageUploadProps) => {
       setCurrentImageId(null);
       setPreview('');
       onImageChange('');
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     },
     onError: (error) => {
       console.error('Failed to delete image', error);
@@ -67,13 +73,25 @@ const ImageUpload = ({ onImageChange }: ImageUploadProps) => {
 
   return (
     <div>
-      <Input name="image" type="file" accept="image/*" onChange={handleImageChange} />
+      <Label htmlFor="image">Image</Label>
+      <Input
+        id="image"
+        name="image"
+        type="file"
+        accept="image/*"
+        onChange={handleImageChange}
+        ref={fileInputRef}
+        className="cursor-pointer"
+      />
       {preview && (
         <div className="mt-2">
-          <img src={preview} alt="Preview" style={{ width: '200px', height: 'auto' }} />
-          <button className="cursor-pointer underline text-red-500 mt-2" onClick={handleDeleteImage}>
+          <img src={preview} alt="Preview" className="w-48 h-auto rounded-md border border-gray-300" />
+          <Button variant="link" onClick={handleDeleteImage} className="text-red-500 mt-1">
+            Delete Image
+          </Button>
+          {/* <button className="cursor-pointer underline text-red-500 mt-2" onClick={handleDeleteImage}>
             Delete
-          </button>
+          </button> */}
         </div>
       )}
     </div>
