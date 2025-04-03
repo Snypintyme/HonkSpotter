@@ -74,55 +74,53 @@ const ReportSighting = () => {
   };
 
   return (
-    <>
-      <Button variant="link" onClick={() => router.history.back()} className="text-blue-500 px-0">
+    <form onSubmit={handleSubmit} className="space-y-4 flex flex-col h-full container mx-auto px-6 py-4">
+      <Button variant="link" onClick={() => router.history.back()} className="text-blue-500 px-0 self-start mb-4">
         &larr; Back
       </Button>
-      <form onSubmit={handleSubmit} className="space-y-4 flex flex-col h-full">
-        <h2 className="text-2xl font-bold mb-4">Report Goose Sighting</h2>
-        <Label htmlFor="name">Location Name</Label>
-        <Input name="name" placeholder="Name" value={formData.name} onChange={handleChange} required />
+      <h2 className="text-2xl font-bold mb-4">Report Goose Sighting</h2>
+      <Label htmlFor="name">Location Name</Label>
+      <Input name="name" placeholder="Name" value={formData.name} onChange={handleChange} required />
 
-        <Label htmlFor="notes">Notes</Label>
-        <Textarea
-          name="notes"
-          placeholder="Write any notes here..."
-          value={formData.notes}
-          onChange={handleChange}
-        />
+      <Label htmlFor="notes">Notes</Label>
+      <Textarea
+        name="notes"
+        placeholder="Write any notes here..."
+        value={formData.notes}
+        onChange={handleChange}
+      />
 
-        <div className="flex flex-row">
-          <div className="mr-4">
-            <Label htmlFor="lat">Latitude</Label>
-            <Input
-              name="lat"
-              placeholder="Latitude"
-              value={formData.lat}
-              className="w-fit"
-              required
-              readOnly
-            />
-          </div>
-          <div>
-            <Label htmlFor="lng">Longitude</Label>
-            <Input
-              name="lng"
-              placeholder="Longitude"
-              value={formData.lng}
-              className="w-fit"
-              required
-              readOnly
-            />
-          </div>
+      <div className="flex flex-row">
+        <div className="mr-4">
+          <Label htmlFor="lat">Latitude</Label>
+          <Input
+            name="lat"
+            placeholder="Latitude"
+            value={formData.lat}
+            className="w-fit"
+            required
+            readOnly
+          />
         </div>
+        <div>
+          <Label htmlFor="lng">Longitude</Label>
+          <Input
+            name="lng"
+            placeholder="Longitude"
+            value={formData.lng}
+            className="w-fit"
+            required
+            readOnly
+          />
+        </div>
+      </div>
 
-        <Label htmlFor="image">Image</Label>
-        <ImageUpload onImageChange={(image) => setFormData((prev) => ({ ...prev, image }))} />
-        <Button type="submit" className="w-fit bg-green-400 hover:bg-green-500 mt-auto">
-          Submit Goose Sighting
-        </Button>
-      </form>
-    </>
+      <Label htmlFor="image">Image</Label>
+      <ImageUpload onImageChange={(image) => setFormData((prev) => ({ ...prev, image }))} />
+      <Button type="submit" className="w-fit bg-green-400 hover:bg-green-500 mt-auto">
+        Submit Goose Sighting
+      </Button>
+    </form>
   );
 };
 
