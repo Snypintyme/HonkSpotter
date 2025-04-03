@@ -68,7 +68,7 @@ const SightingDetail = () => {
           Coordinates: {selectedSighting.coords.lat}, {selectedSighting.coords.lng}
         </p>
         <p className="text-sm text-gray-600">
-          Reported on: {new Date(selectedSighting.created_date).toLocaleDateString()}
+          Reported on: {new Date(selectedSighting.created_date).toLocaleDateString('en', {timeZone: 'America/New_York'})}
         </p>
       </div>
     </div>
