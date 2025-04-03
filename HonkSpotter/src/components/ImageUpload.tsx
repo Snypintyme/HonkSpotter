@@ -5,6 +5,7 @@ import apiClient from '@/api/apiClient';
 import { ApiEndpoints } from '@/enums/apiEndpoints';
 import { Button } from './ui/button';
 import { Label } from './ui/label';
+import { useSnackbar } from 'notistack';
 
 interface ImageUploadProps {
   onImageChange: (image: string) => void;
@@ -14,6 +15,7 @@ const ImageUpload = ({ onImageChange }: ImageUploadProps) => {
   const [preview, setPreview] = useState<string>('');
   const [currentImageId, setCurrentImageId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const { enqueueSnackbar } = useSnackbar();
 
   const uploadImageMutation = useMutation({
     mutationFn: async (file: File) => {
@@ -36,6 +38,10 @@ const ImageUpload = ({ onImageChange }: ImageUploadProps) => {
     },
     onError: (error) => {
       console.error('Image upload failed', error);
+      enqueueSnackbar("Image upload failed", { 
+        variant: 'error',
+        autoHideDuration: 10000
+      });
     },
   });
 
@@ -59,6 +65,14 @@ const ImageUpload = ({ onImageChange }: ImageUploadProps) => {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      enqueueSnackbar('Image size exceeds 5MB. Please upload a smaller file.', {
+        variant: 'error',
+        autoHideDuration: 1000,
+      });
+      return;
+    }
 
     if (!file.type.startsWith('image/')) {
       console.error('Selected file is not an image');
