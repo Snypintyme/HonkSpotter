@@ -61,7 +61,6 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
               placeholder="Enter your username"
               value={formData.username}
               onChange={(e) => handleInputChange('username', e.target.value)}
-              required
             />
           </div>
 
@@ -73,35 +72,16 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
               placeholder="Write a short description about yourself..."
               value={formData.description}
               onChange={(e) => handleInputChange('description', e.target.value)}
-              required
             />
           </div>
 
           {/* Profile Picture Upload */}
           <div>
-            <Label htmlFor="profile_picture">Profile Picture</Label>
             <ImageUpload
               onImageChange={
                 (image) => handleInputChange('profile_picture', image) // Update profile picture in form data
               }
             />
-            {formData.profile_picture && (
-              <div className="mt-4">
-                <img
-                  src={formData.profile_picture}
-                  alt="Profile Preview"
-                  className="w-32 h-auto rounded-md border border-gray-300"
-                />
-                {/* Optionally remove this section if ImageUpload handles deletion */}
-                <button
-                  type="button"
-                  className="text-red-500 underline mt-2"
-                  onClick={() => handleInputChange('profile_picture', '')}
-                >
-                  Remove Image
-                </button>
-              </div>
-            )}
           </div>
 
           {/* Save Button */}
