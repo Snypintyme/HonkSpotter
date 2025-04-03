@@ -6,6 +6,8 @@
 #
 alembic==1.15.1
     # via flask-migrate
+bleach==6.2.0
+    # via -r requirements.in
 blinker==1.6.2
     # via flask
 boto3==1.37.23
@@ -24,8 +26,6 @@ colorama==0.4.6
     # via
     #   click
     #   pytest
-exceptiongroup==1.2.2
-    # via pytest
 faker==37.0.2
     # via -r requirements.in
 flask==2.3.2
@@ -104,6 +104,8 @@ urllib3==1.26.20
     # via
     #   botocore
     #   requests
+webencodings==0.5.1
+    # via bleach
 werkzeug==2.3.6
     # via
     #   flask
