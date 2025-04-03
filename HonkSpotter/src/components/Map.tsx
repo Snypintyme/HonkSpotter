@@ -68,7 +68,6 @@ const Map = () => {
   function CustomMarker() {
     useMapEvents({
       click: (e) => {
-        console.log(e.latlng);
         setCoordinates({ lat: e.latlng.lat, lng: e.latlng.lng });
       }
     });
