@@ -20,7 +20,6 @@ export const useImage = (imageId: string | null) => {
     queryKey: ['image', imageId],
     queryFn: () => fetchImage(imageId!),
     enabled: !!imageId,
-    staleTime: Infinity,
   });
 
   useEffect(() => {
