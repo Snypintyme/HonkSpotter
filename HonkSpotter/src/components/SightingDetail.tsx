@@ -6,6 +6,7 @@ import { useImage } from '@/hooks/useImage';
 import { useNavigate } from '@tanstack/react-router';
 import ProfilePicture from './ProfilePicture';
 import { useCoordinatesStore } from '@/store/useCoordinatesStore';
+import { toLocalTimestamp } from '@/lib/utils';
 
 const SightingDetail = () => {
   const { gooseSightings, selectedSighting, setSelectedSighting } = useGooseSightingStore();
@@ -67,9 +68,7 @@ const SightingDetail = () => {
         <p className="text-sm text-gray-600 mb-2">
           Coordinates: {selectedSighting.coords.lat}, {selectedSighting.coords.lng}
         </p>
-        <p className="text-sm text-gray-600">
-          Reported on: {new Date(selectedSighting.created_date).toLocaleDateString('en', {timeZone: 'America/New_York'})}
-        </p>
+        <p className="text-sm text-gray-600">Reported on: {toLocalTimestamp(selectedSighting.created_date)}</p>
       </div>
     </div>
   );

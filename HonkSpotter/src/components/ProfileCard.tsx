@@ -9,7 +9,7 @@ import apiClient from '@/api/apiClient';
 import { useSnackbar } from 'notistack';
 import { isAxiosError } from 'axios';
 import { GooseSighting } from '@/interfaces/gooseSighting';
-import { navigateToSightingDetail } from '@/lib/utils';
+import { navigateToSightingDetail, toLocalDate } from '@/lib/utils';
 import ProfilePicture from './ProfilePicture';
 
 interface ProfileCardProps {
@@ -88,9 +88,7 @@ const ProfileCard = ({ user, sightings }: ProfileCardProps) => {
                   >
                     <h3 className="font-bold text-lg">{sighting.name}</h3>
                     <p>{sighting.notes || 'No additional notes provided.'}</p>
-                    <span className="text-sm text-gray-500">
-                      Reported on {new Date(sighting.created_date).toLocaleDateString()}
-                    </span>
+                    <span className="text-sm text-gray-500">Reported on {toLocalDate(sighting.created_date)}</span>
                   </li>
                 ))}
               </ul>
