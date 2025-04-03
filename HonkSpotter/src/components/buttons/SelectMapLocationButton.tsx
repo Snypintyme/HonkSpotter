@@ -9,10 +9,10 @@ export default function SelectMapLocationButton({ onClick }: SelectMapLocationBu
   return (
     <div className="fixed z-99999 bottom-8 right-4">
       <Button
-        className="rounded-sm shadow-md border-2 border-black bg-white hover:bg-gray-200 cursor-pointer"
+        className="rounded-sm shadow-md border-2 border-black bg-white hover:bg-white"
         onClick={onClick}
       >
-        <p className="text-black underline">Choose a location</p>
+        <p className="text-black">Choose a location by clicking on the map</p>
         <MapPin color="red"/>
       </Button>
     </div>

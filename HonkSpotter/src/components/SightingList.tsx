@@ -1,8 +1,16 @@
 import { navigateToSightingDetail } from '@/lib/utils';
+import { useCoordinatesStore } from '@/store/useCoordinatesStore';
 import { useGooseSightingStore } from '@/store/useGooseSightingStore';
+import { useEffect } from 'react';
 
 const SightingList = () => {
   const { gooseSightings } = useGooseSightingStore();
+  const { setMapShouldPickCoords } = useCoordinatesStore();
+
+  // Change back to normal pins
+  useEffect(() => {
+    setMapShouldPickCoords(false);
+  }, [])
 
   return (
     <>

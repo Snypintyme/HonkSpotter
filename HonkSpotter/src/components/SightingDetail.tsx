@@ -5,9 +5,11 @@ import router, { detailRoute } from '@/router';
 import { useImage } from '@/hooks/useImage';
 import { useNavigate } from '@tanstack/react-router';
 import ProfilePicture from './ProfilePicture';
+import { useCoordinatesStore } from '@/store/useCoordinatesStore';
 
 const SightingDetail = () => {
   const { gooseSightings, selectedSighting, setSelectedSighting } = useGooseSightingStore();
+  const { setMapShouldPickCoords } = useCoordinatesStore();
   const { sightingId } = detailRoute.useParams();
   const { image, error } = useImage(selectedSighting?.image ?? null);
   const navigate = useNavigate();
@@ -15,6 +17,11 @@ const SightingDetail = () => {
   useEffect(() => {
     setSelectedSighting(gooseSightings.find((sighting) => sighting.id === sightingId) ?? null);
   }, [gooseSightings, setSelectedSighting, sightingId]);
+
+  // Change back to normal pins
+  useEffect(() => {
+    setMapShouldPickCoords(false);
+  }, [])
 
   if (!selectedSighting) return <p>Cannot find sighting</p>;
 
