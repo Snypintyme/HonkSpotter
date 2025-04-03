@@ -85,7 +85,7 @@ const ReportSighting = () => {
       <Label htmlFor="notes">Notes</Label>
       <Textarea name="notes" placeholder="Write any notes here..." value={formData.notes} onChange={handleChange} />
 
-      <div className="flex flex-row">
+      <div className="flex flex-row flex-wrap">
         <div className="mr-4">
           <Label htmlFor="lat">Latitude</Label>
           <Input name="lat" placeholder="Latitude" value={formData.lat} className="w-fit" required readOnly />
