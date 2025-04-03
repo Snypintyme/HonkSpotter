@@ -66,8 +66,13 @@ const ImageUpload = ({ onImageChange }: ImageUploadProps) => {
     }
 
     const objectUrl = URL.createObjectURL(file);
-    setPreview(objectUrl);
-    uploadImageMutation.mutate(file);
+
+    if (objectUrl.startsWith('blob:')) {
+      setPreview(objectUrl);
+      uploadImageMutation.mutate(file);
+    } else {
+      console.error('Invalid preview URL');
+    }
 
     return () => {
       URL.revokeObjectURL(objectUrl);
@@ -99,9 +104,6 @@ const ImageUpload = ({ onImageChange }: ImageUploadProps) => {
           <Button variant="link" onClick={handleDeleteImage} className="text-red-500 mt-1">
             Delete Image
           </Button>
-          {/* <button className="cursor-pointer underline text-red-500 mt-2" onClick={handleDeleteImage}>
-            Delete
-          </button> */}
         </div>
       )}
     </div>
