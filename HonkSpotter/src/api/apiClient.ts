@@ -1,6 +1,5 @@
 import axios, { AxiosRequestHeaders, AxiosResponse } from 'axios';
 import { useAuthStore } from '@/store/useAuthStore';
-import { enqueueSnackbar } from 'notistack';
 
 const apiURL = import.meta.env.VITE_API_URL;
 
@@ -65,7 +64,6 @@ apiClient.interceptors.response.use(
         return apiClient(originalRequest);
       } catch (refreshError) {
         useAuthStore.getState().clearAccessToken();
-        enqueueSnackbar('Your session has expired. Please log in again.', { variant: 'error' });
         return Promise.reject(refreshError);
       }
     }
